@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using UnityEngine;
+using BP_API;
 
 namespace BPDZ
 {
@@ -12,6 +13,7 @@ namespace BPDZ
     {
         public static string GodListFile = @"BPDayZ/Godlist.txt";
         public static int PermissionLevel = 1;
+
         public static void Run(string username)
         {
             if (DayZManager.ReadData(GodListFile).Contains(username))
@@ -29,9 +31,9 @@ namespace BPDZ
         { 
 
             List<string> allusers = DayZManager.ReadData(GodListFile).Split(new[] { Environment.NewLine }, StringSplitOptions.None).ToList();
-            foreach (var e in allusers)
+            foreach (var user in allusers)
             {
-                DayZManager.WriteData(GodListFile, e);
+                DayZManager.WriteData(GodListFile, user);
             }
             DayZManager.WriteData(GodListFile, username);
         }
@@ -41,13 +43,23 @@ namespace BPDZ
             List<string> allusers = DayZManager.ReadData(GodListFile).Split(new[] { Environment.NewLine }, StringSplitOptions.None).ToList();
 
             allusers.Remove(username);
-            foreach (var e in allusers)
+            foreach (var user in allusers)
             {
-                if (!e.Contains(" "))
+                if (!user.Contains(" "))
                 {
-                    DayZManager.WriteData(GodListFile, e);
+                    DayZManager.WriteData(GodListFile, user);
                 }
             }
+        }
+
+        public static bool HasGodmode(Player instance)
+        {
+            string playerlist = DayZManager.ReadData(GodListFile);
+            if (playerlist.Contains(instance.Username))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

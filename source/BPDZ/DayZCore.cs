@@ -29,7 +29,17 @@ namespace BPDZ
         static void PlayerzEvents()
         {
             PlayerEvents.OnPlayerConnected += OnPlayerConnected;
+            PlayerEvents.OnPlayerDamage += OnPlayerDamage;
             // PlayerEvents.OnGlobalChatMessage += SvGlobalChatMessage;
+        }
+
+        static bool OnPlayerDamage(Player player, Player attacker, ref DamageIndex type, ref float amount, ref Collider collider)
+        {
+            if (GodMode.HasGodmode(player))
+            {
+                return false;
+            }
+            return true;
         }
 
         static void ZombieEvents()
