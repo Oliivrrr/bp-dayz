@@ -276,21 +276,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\Discord.cs" />
+    <Compile Include="Commands\Help.cs" />
     <Compile Include="DayZManager.cs" />
-    <Compile Include="GodMode.cs" />
-    <Compile Include="DayZGroups.cs" />
-    <Compile Include="GunIndex.cs" />
-    <Compile Include="LootDrops.cs" />
-    <Compile Include="PlayerZ.cs" />
+    <Compile Include="Commands\GodMode.cs" />
+    <Compile Include="Types\DayZGroups.cs" />
+    <Compile Include="Types\GunIndex.cs" />
+    <Compile Include="PlayerZ\LootDrops.cs" />
+    <Compile Include="PlayerZ\PlayerZ.cs" />
     <Compile Include="DayZCore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Zombies.cs" />
+    <Compile Include="PlayerZ\Zombies.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ammoindex.json" />
-    <None Include="armourindex.json" />
-    <None Include="foodindex.json" />
-    <None Include="gunindex.json" />
+    <None Include="Data\ammoindex.json" />
+    <None Include="Data\armourindex.json" />
+    <None Include="Data\foodindex.json" />
+    <None Include="Data\gunindex.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
