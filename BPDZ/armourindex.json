@@ -1,0 +1,102 @@
+[
+  {
+    "Name": "GasMask",
+    "Rarity": 1,
+    "ID": -1627168389
+  },
+  {
+    "Name": "HatHazard",
+    "Rarity": 1,
+    "ID": -633509750
+  },
+  {
+    "Name": "HardHatMedium",
+    "Rarity": 1,
+    "ID": 880705339
+  },
+  {
+    "Name": "RiotHelmet",
+    "Rarity": 1,
+    "ID": -766353867
+  },
+  {
+    "Name": "HelmetFootBallBlue",
+    "Rarity": 1,
+    "ID": 226920179
+  },
+  {
+    "Name": "HelmetCombat",
+    "Rarity": 1,
+    "ID": -1310874884
+  },
+
+
+  {
+    "Name": "PantsChauffeur",
+    "Rarity": 2,
+    "ID": -1888685880
+  },
+  {
+    "Name": "PantsConstructionOrange",
+    "Rarity": 2,
+    "ID": 134344360
+  },
+  {
+    "Name": "PantsFootBallBlue",
+    "Rarity": 2,
+    "ID": 1561055750
+  },
+  {
+    "Name": "PantsCombat",
+    "Rarity": 2,
+    "ID": 1998080865
+  },
+  {
+    "Name": "PantsFire",
+    "Rarity": 2,
+    "ID": -1527091616
+  },
+  {
+    "Name": "PantsRiot",
+    "Rarity": 2,
+    "ID": -295837114
+  },
+
+
+  {
+    "Name": "JacketFire",
+    "Rarity": 2,
+    "ID": 2065462452
+  },
+  {
+    "Name": "TopConstructionBlue",
+    "Rarity": 2,
+    "ID": 1258964252
+  },
+  {
+    "Name": "ShirtFootBallBlue",
+    "Rarity": 2,
+    "ID": -849689176
+  },
+  {
+    "Name": "TopCombat",
+    "Rarity": 3,
+    "ID": 388702693
+  },
+  {
+    "Name": "TopSafetyVest",
+    "Rarity": 3,
+    "ID": 602133489
+  },
+  {
+    "Name": "TopRiot",
+    "Rarity": 3,
+    "ID": -645285295
+  },
+
+  {
+    "Name": "KevlarVest",
+    "Rarity": 4,
+    "ID": 112674745
+  }
+]

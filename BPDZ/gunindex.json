@@ -1,0 +1,95 @@
+[
+  {
+    "Name": "Glock",
+    "Rarity": 1,
+    "ID": -1975896234,
+    "AmmoType": "PistolAmmo"
+  },
+  {
+    "Name": "Sig",
+    "Rarity": 1,
+    "ID": -162370066,
+    "AmmoType": "PistolAmmo"
+  },
+  {
+    "Name": "Colt",
+    "Rarity": 1,
+    "ID": 1968059740,
+    "AmmoType": "PistolAmmo"
+  },
+  {
+    "Name": "Taser",
+    "Rarity": 1,
+    "ID": 2015188875,
+    "AmmoType": "TaserAmmo"
+  },
+
+  {
+    "Name": "Springfield",
+    "Rarity": 2,
+    "ID": 1053582733,
+    "AmmoType": "RifleAmmo"
+  },
+  {
+    "Name": "Mac",
+    "Rarity": 2,
+    "ID": 794733957,
+    "AmmoType": "SMGAmmo"
+  },
+  {
+    "Name": "SPAS12",
+    "Rarity": 2,
+    "ID": 1075047858,
+    "AmmoType": "ShotgunAmmo"
+  },
+  {
+    "Name": "MP5SD",
+    "Rarity": 2,
+    "ID": 1875626018,
+    "AmmoType": "SMGAmmo"
+  },
+  {
+    "Name": "Shotgun",
+    "Rarity": 2,
+    "ID": 554920573,
+    "AmmoType": "ShotgunAmmo"
+  },
+
+  {
+    "Name": "Winchester",
+    "Rarity": 3,
+    "ID": 238752591,
+    "AmmoType": "RifleAmmo"
+  },
+  {
+    "Name": "AK-47",
+    "Rarity": 3,
+    "ID": 2109002909,
+    "AmmoType": "RifleAmmo"
+  },
+  {
+    "Name": "M4",
+    "Rarity": 3,
+    "ID": 633001730,
+    "AmmoType": "RifleAmmo"
+  },
+  {
+    "Name": "SAW",
+    "Rarity": 3,
+    "ID": -1384309123,
+    "AmmoType": "MachineGunAmmo"
+  },
+  {
+    "Name": "PKM",
+    "Rarity": 3,
+    "ID": -2011341759,
+    "AmmoType": "MachineGunAmmo"
+  },
+
+  {
+    "Name": "Bazooka",
+    "Rarity": 4,
+    "ID": -1572858027,
+    "AmmoType": "Rocket"
+  }
+]

@@ -1,0 +1,40 @@
+[
+  {
+    "Name": "PistolAmmo",
+    "Rarity": 1,
+    "ID": 493970259
+  },
+  {
+    "Name": "TaserAmmo",
+    "Rarity": 1,
+    "ID": -906852676
+  },
+
+  {
+    "Name": "SMGAmmo",
+    "Rarity": 2,
+    "ID": 168336396
+  },
+  {
+    "Name": "MachineGunAmmo",
+    "Rarity": 2,
+    "ID": 869043502
+  },
+
+  {
+    "Name": "RifleAmmo",
+    "Rarity": 3,
+    "ID": -872807194
+  },
+  {
+    "Name": "ShotgunAmmo",
+    "Rarity": 3,
+    "ID": 1086364132
+  },
+
+  {
+    "Name": "Rocket",
+    "Rarity": 4,
+    "ID": -921321944
+  }
+]

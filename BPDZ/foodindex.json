@@ -1,0 +1,63 @@
+[
+  {
+    "Name": "SodaCan2",
+    "Rarity": 1,
+    "ID": 123684252
+  },
+  {
+    "Name": "Bacon",
+    "Rarity": 1,
+    "ID": 1702175260
+  },
+  {
+    "Name": "Corn1",
+    "Rarity": 1,
+    "ID": 1205979388
+  },
+
+
+  {
+    "Name": "WaterBottle1",
+    "Rarity": 2,
+    "ID": 1877954167
+  },
+  {
+    "Name": "Chicken",
+    "Rarity": 2,
+    "ID": 1201374976
+  },
+  {
+    "Name": "Pineapple",
+    "Rarity": 2,
+    "ID": -1220321196
+  },
+
+
+  {
+    "Name": "EnergyCan1",
+    "Rarity": 3,
+    "ID": 1734556914
+  },
+  {
+    "Name": "WaterMelon1",
+    "Rarity": 3,
+    "ID": 811305019
+  },
+  {
+    "Name": "Turkey",
+    "Rarity": 3,
+    "ID": 1897785191
+  },
+
+  {
+    "Name": "MedicBox1",
+    "Rarity": 4,
+    "ID": 467765943
+  },
+  
+  {
+    "Name": "MedicBox2",
+    "Rarity": 4,
+    "ID": -2098668787
+  }
+]
