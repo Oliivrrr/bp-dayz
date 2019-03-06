@@ -12,5 +12,6 @@ namespace BPDZ
         public string DisplayName { get; set; }
         public string PermissionLevel { get; set; }
         public string Color { get; set; }
+        public string [] Players { get; set; }
     }
 }

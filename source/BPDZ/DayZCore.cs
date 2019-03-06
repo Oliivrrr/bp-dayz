@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using BPDayZ;
+using System.IO;
 
 namespace BPDZ
 {
@@ -16,6 +17,22 @@ namespace BPDZ
         public static void Main()
         {
             Debug.Log($"{ResourceName} being loaded in");
+            if (!Directory.Exists(@"BPDayZ"))
+            {
+                Debug.Log("[BPDZ] Creating directory BPDayZ...");
+                Directory.CreateDirectory("BPDayZ/Index");
+                Directory.CreateDirectory("BPDayZ/Groups");
+                Debug.Log("[BPDZ] Successfully created directory");
+                Debug.Log("[BPDZ] Creating files...");
+                File.Create("BPDayZ/GodList.txt");
+                File.Create("BPDayZ/DiscordLink.txt");
+                Debug.Log("[BPDZ] Successfully created files");
+            }
+
+            else
+            {
+                Debug.Log("[BPDZ] All resources loaded");
+            }
             SetResourceInfo();
             PlayerzEvents();
             
@@ -23,14 +40,14 @@ namespace BPDZ
         static void SetResourceInfo()
         {
             BP_API.Core.Resources[ResourceName].ResourceInfo.Author = "Unlucky";
-            BP_API.Core.Resources[ResourceName].ResourceInfo.Description = "A DayZ plugin for Broke protocol created by Unlucky";
+            BP_API.Core.Resources[ResourceName].ResourceInfo.Description = "A DayZ plugin created by Unlucky";
         }
 
         static void PlayerzEvents()
         {
             PlayerEvents.OnPlayerConnected += OnPlayerConnected;
             PlayerEvents.OnPlayerDamage += OnPlayerDamage;
-            // PlayerEvents.OnGlobalChatMessage += SvGlobalChatMessage;
+            PlayerEvents.OnGlobalChatMessage += SvGlobalChatMessage;
         }
 
         static bool OnPlayerDamage(Player player, Player attacker, ref DamageIndex type, ref float amount, ref Collider collider)
@@ -47,9 +64,9 @@ namespace BPDZ
             PlayerEvents.OnNpcSpawned += Zombies.SetZombie;
         }
 
-        static bool SvGlobalChatMessage(Player instance, ref string message)
+        static bool SvGlobalChatMessage(Player player, ref string message)
         {
-            DayZManager.SvGlobalChatMessage(instance, message);
+            DayZManager.SvGlobalChatMessage(player, message);
             return false;
         }
         static void OnPlayerConnected(Player player)

@@ -11,31 +11,23 @@ namespace BPDZ
 {
     class GodMode
     {
-        public static string GodListFile = @"BPDayZ/Godlist.txt";
-        public static int PermissionLevel = 1;
+        public static string GodListFile = @"BPDayZ/GodList.txt";
+        public static int PermissionLevel = 10;
 
         public static void Run(string username)
         {
             if (File.ReadAllText(GodListFile).Contains(username))
             {
-                List<string> allusers = File.ReadAllText(GodListFile).Split(new[] { Environment.NewLine }, StringSplitOptions.None).ToList();
-                allusers.Add(username);
-
-                File.WriteAllText(GodListFile, allusers.ToString());
+                List<string> allusers = File.ReadAllLines(GodListFile).ToList();
+                allusers.Remove(username);
+                File.WriteAllLines(GodListFile, allusers);
             }
 
             else
             {
                 List<string> allusers = File.ReadAllText(GodListFile).Split(new[] { Environment.NewLine }, StringSplitOptions.None).ToList();
-
-                allusers.Remove(username);
-                foreach (var user in allusers)
-                {
-                    if (!user.Contains(" "))
-                    {
-                        File.WriteAllText(GodListFile, user);
-                    }
-                }
+                allusers.Add(username);
+                File.WriteAllText(GodListFile, allusers.ToString());
             }
         }
 
