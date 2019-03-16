@@ -36,7 +36,7 @@ namespace BPDZ
             {                
                 Debug.Log($"[BPDayZLogger] Message sent: [{player.svPlayer.player.ID}]  {player.svPlayer.player.username}: {message}");
                 player.svPlayer.svManager.chatted.Add(player.svPlayer.player);
-                player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GameMessage, $" {player.svPlayer.player.username}: {message}");
+                player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GameMessage, $"[{player.ID}] {groupsdisplayname} {player.svPlayer.player.username}: {message}");
                 return;
             }
         }
@@ -151,15 +151,14 @@ namespace BPDZ
 
             foreach (var files in directory.GetFiles("*.txt"))
             {
-                List<string> Contents = File.ReadAllLines($"BPDayZ/Groups/{files.Name}").ToList();
-                List<string> playerList = Contents;
-                playerList.RemoveRange(Contents.IndexOf(Contents[0]), Contents.IndexOf(Contents[1]));
-                ListOfGroups.Add(new DayZGroups { Name = files.Name, DisplayName = $"[{Path.GetFileNameWithoutExtension($"BPDayZ/Groups/{files.Name}")}]", Color = $"{Contents[0]}", PermissionLevel = Contents[1], Players = playerList.ToArray()});
+                string[] Contents = File.ReadAllLines(files.FullName);
+                ListOfGroups.Add(new DayZGroups { Name = files.Name, DisplayName = $"[{Path.GetFileNameWithoutExtension(files.FullName)}]", Color = Contents[0], PermissionLevel = Contents[1], Players = Contents});
             }
 
             foreach(var group in ListOfGroups)
             {
-                if (group.Players.Contains(player.Username))
+                var Players = new List<string>(group.Players);
+                if (Players.Find(x => x == player.Username) != null)
                 {
                     playersGroups.Add(group);
                 }

@@ -305,6 +305,6 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetFileName)" "..\..\..\..\Plugins\"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetFileName)" "..\..\..\..\..\Plugins\"</PostBuildEvent>
   </PropertyGroup>
 </Project>
