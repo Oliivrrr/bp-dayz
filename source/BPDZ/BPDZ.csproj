@@ -276,15 +276,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\Ban.cs" />
-    <Compile Include="Commands\Discord.cs" />
-    <Compile Include="Commands\Help.cs" />
-    <Compile Include="Commands\Kick.cs" />
-    <Compile Include="Commands\Kill.cs" />
-    <Compile Include="Commands\Mute.cs" />
-    <Compile Include="Commands\Teleport.cs" />
     <Compile Include="DayZManager.cs" />
-    <Compile Include="Commands\GodMode.cs" />
+    <Compile Include="PlayerZ\Commandz.cs" />
     <Compile Include="Types\DayZGroups.cs" />
     <Compile Include="Types\GunIndex.cs" />
     <Compile Include="PlayerZ\LootDrops.cs" />

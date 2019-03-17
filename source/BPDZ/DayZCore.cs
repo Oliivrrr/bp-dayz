@@ -16,7 +16,7 @@ namespace BPDZ
         [EntryPoint(ResourceName)]
         public static void Main()
         {
-            Debug.Log($"{ResourceName} being loaded in");
+            Debug.Log($"[BPDZ] {ResourceName} being loaded in");
             if (!Directory.Exists(@"BPDayZ"))
             {
                 Debug.Log("[BPDZ] Creating directory BPDayZ...");
@@ -33,9 +33,9 @@ namespace BPDZ
             {
                 Debug.Log("[BPDZ] All resources loaded");
             }
+
             SetResourceInfo();
-            PlayerzEvents();
-            
+            PlayerzEvents();            
         }
         static void SetResourceInfo()
         {
@@ -52,9 +52,13 @@ namespace BPDZ
 
         static bool OnPlayerDamage(Player player, Player attacker, ref DamageIndex type, ref float amount, ref Collider collider)
         {
-            if (GodMode.HasGodmode(player))
+            foreach (var name in File.ReadAllLines(Commandz.GodListFile))
             {
-                return false;
+                if (name == player.Username)
+                {
+                    player.SendChatMessage(SvSendType.Self, $"<color=white>Blocked {amount}HP of damage</color>");
+                    return false;
+                }
             }
             return true;
         }
