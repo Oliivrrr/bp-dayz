@@ -23,7 +23,6 @@ namespace BPDZ
                 Debug.Log($"[BPDayZLogger] Message sent: [{player.svPlayer.player.ID}]  {player.svPlayer.player.username}: {message}");
                 player.svPlayer.svManager.chatted.Add(player.svPlayer.player);
                 player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GameMessage, $"[{player.ID}] {groupsdisplayname} {player.svPlayer.player.username}: {message}");
-                return;
             }
         }
 

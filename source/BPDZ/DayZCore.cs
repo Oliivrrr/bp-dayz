@@ -66,6 +66,7 @@ namespace BPDZ
         static void ZombieEvents()
         {
             PlayerEvents.OnNpcSpawned += Zombies.SetZombie;
+            PlayerEvents.OnNpcSpawned += Zombies.AliveLoop;
         }
 
         static bool SvGlobalChatMessage(Player player, ref string message)

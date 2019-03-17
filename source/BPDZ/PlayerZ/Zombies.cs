@@ -55,63 +55,86 @@ namespace BPDayZ
             }
         }
 
-        public static bool SetZombie(Player instance, ref Vector3 position, ref Quaternion rotation, ref Place place, ref Waypoint node, ref ShPlayer spawner, ref ShEntity mount, ref ShPlayer enemy)
+        public static bool SetZombie(Player zombie, ref Vector3 position, ref Quaternion rotation, ref Place place, ref Waypoint node, ref ShPlayer spawner, ref ShEntity mount, ref ShPlayer enemy)
         {
             if (DayZCore.RNG(1, 150) == 1)
             {
                 
-                GiveItems(instance.svPlayer, DayZCore.RNG(1, 100));
-                instance.svPlayer.player.ShDie();
-                instance.svPlayer.player.gameObject.SetActive(false);
+                GiveItems(zombie.svPlayer, DayZCore.RNG(1, 100));
+                zombie.svPlayer.player.ShDie();
+                zombie.svPlayer.player.gameObject.SetActive(false);
             }
 
             if (DayZCore.RNG(1, 100) == 1)
             {
                 
-                instance.svPlayer.SvSetJob(instance.svPlayer.player.jobs[JobIndex.Paramedic], true, false);
-                foreach (InventoryItem inventoryItem in instance.svPlayer.player.myItems.Values.ToList<InventoryItem>())
+                zombie.svPlayer.SvSetJob(zombie.svPlayer.player.jobs[JobIndex.Paramedic], true, false);
+                foreach (InventoryItem inventoryItem in zombie.svPlayer.player.myItems.Values.ToList<InventoryItem>())
                 {
-                    instance.svPlayer.player.TransferItem(2, inventoryItem.item.index, instance.svPlayer.player.MyItemCount(inventoryItem.item.index), true);
+                    zombie.svPlayer.player.TransferItem(2, inventoryItem.item.index, zombie.svPlayer.player.MyItemCount(inventoryItem.item.index), true);
                 }
                 int SpawnType = DayZCore.RNG(1, 100);
                 if (SpawnType < 30)
                 {
-                    instance.svPlayer.player.AddToMyItems(-828647977, DayZCore.RNG(20, 30));
-                    instance.svPlayer.player.AddToMyItems(-1477501700, 1);
-                    instance.svPlayer.player.curEquipable.moveSpeed = 1.25f;
-                    instance.svPlayer.player.health = 80;
+                    zombie.svPlayer.player.AddToMyItems(-828647977, DayZCore.RNG(20, 30));
+                    zombie.svPlayer.player.AddToMyItems(-1477501700, 1);
+                    zombie.svPlayer.player.curEquipable.moveSpeed = 1.25f;
+                    zombie.svPlayer.player.health = 80;
                 }
 
                 else if (SpawnType < 50)
                 {
-                    instance.svPlayer.player.AddToMyItems(-828647977, DayZCore.RNG(30, 40));
-                    instance.svPlayer.player.AddToMyItems(-484090981, 1);
-                    instance.svPlayer.player.curEquipable.moveSpeed = 3;
-                    instance.svPlayer.player.health = 150;
+                    zombie.svPlayer.player.AddToMyItems(-828647977, DayZCore.RNG(30, 40));
+                    zombie.svPlayer.player.AddToMyItems(-484090981, 1);
+                    zombie.svPlayer.player.curEquipable.moveSpeed = 3;
+                    zombie.svPlayer.player.health = 150;
                 }
 
                 else if (SpawnType < 70)
                 {
-                    instance.svPlayer.player.AddToMyItems(-828647977, DayZCore.RNG(40, 50));
-                    instance.svPlayer.player.AddToMyItems(-406179965, 1);
-                    instance.svPlayer.player.curEquipable.moveSpeed = 2;
-                    instance.svPlayer.player.health = 200;
+                    zombie.svPlayer.player.AddToMyItems(-828647977, DayZCore.RNG(40, 50));
+                    zombie.svPlayer.player.AddToMyItems(-406179965, 1);
+                    zombie.svPlayer.player.curEquipable.moveSpeed = 2;
+                    zombie.svPlayer.player.health = 200;
                 }
 
                 else if (SpawnType < 80)
                 {
-                    instance.svPlayer.player.AddToMyItems(-828647977, DayZCore.RNG(60, 70));
-                    instance.svPlayer.player.AddToMyItems(1670374823, 1);
-                    instance.svPlayer.player.curEquipable.moveSpeed = 1;
-                    instance.svPlayer.player.health = 275;
+                    zombie.svPlayer.player.AddToMyItems(-828647977, DayZCore.RNG(60, 70));
+                    zombie.svPlayer.player.AddToMyItems(1670374823, 1);
+                    zombie.svPlayer.player.curEquipable.moveSpeed = 1;
+                    zombie.svPlayer.player.health = 275;
                 }
 
                 else if (SpawnType < 95)
                 {
-                    instance.svPlayer.player.AddToMyItems(-828647977, DayZCore.RNG(100, 175));
-                    instance.svPlayer.player.AddToMyItems(-648442112, 1);
-                    instance.svPlayer.player.curEquipable.moveSpeed = 2;
-                    instance.svPlayer.player.health = 500;
+                    zombie.svPlayer.player.AddToMyItems(-828647977, DayZCore.RNG(100, 175));
+                    zombie.svPlayer.player.AddToMyItems(-648442112, 1);
+                    zombie.svPlayer.player.curEquipable.moveSpeed = 2;
+                    zombie.svPlayer.player.health = 500;
+                }
+            }
+            return true;
+        }
+
+        public static bool AliveLoop(Player zombie, ref Vector3 position, ref Quaternion rotation, ref Place place, ref Waypoint node, ref ShPlayer spawner, ref ShEntity mount, ref ShPlayer enemy)
+        {
+            while (zombie.svPlayer.gameObject.active)
+            {
+                foreach (Sector sector in zombie.svPlayer.localSectors)
+                {
+                    foreach (ShEntity shEntity in sector.centered)
+                    {
+                        if (!(shEntity == zombie.svPlayer.entity))
+                        {
+                            ShPlayer shPlayer = shEntity as ShPlayer;
+                            if (shPlayer && !shPlayer.IsDead() && !shPlayer.svPlayer.serverside && zombie.svPlayer.player.CanSeeEntity(shPlayer))
+                            {
+                                zombie.svPlayer.targetEntity = shPlayer;
+                                zombie.svPlayer.SetState(10);
+                            }
+                        }
+                    }
                 }
             }
             return true;
