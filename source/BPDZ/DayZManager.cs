@@ -11,17 +11,20 @@ namespace BPDZ
     {
         public static void SvGlobalChatMessage(Player player, string message)
         {
-            string groupsdisplayname = "";
-            List<DayZGroups> groups = GroupGrabber(player).OrderByDescending(o => o.PermissionLevel).ToList();
-            foreach (var group in groups)
+            if (!File.ReadAllLines(DayZCore.MuteFilePath).Contains(player.Username))
             {
-                groupsdisplayname = $"{groupsdisplayname} <color={group.Color}>{group.DisplayName} </color>";
-            }
+                string groupsdisplayname = "";
+                List<DayZGroups> groups = GroupGrabber(player).OrderByDescending(o => o.PermissionLevel).ToList();
+                foreach (var group in groups)
+                {
+                    groupsdisplayname = $"{groupsdisplayname} <color={group.Color}>{group.DisplayName} </color>";
+                }
 
-            if (!player.svPlayer.svManager.chatted.OverLimit(player.svPlayer.player))
-            {
-                player.svPlayer.svManager.chatted.Add(player.svPlayer.player);
-                player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GameMessage, $"[{player.ID}] {groupsdisplayname} {player.svPlayer.player.username}: {message}");
+                if (!player.svPlayer.svManager.chatted.OverLimit(player.svPlayer.player))
+                {
+                    player.svPlayer.svManager.chatted.Add(player.svPlayer.player);
+                    player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GameMessage, $"[{player.ID}] {groupsdisplayname} {player.svPlayer.player.username}: {message}");
+                }
             }
         }
 
