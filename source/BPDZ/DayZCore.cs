@@ -100,9 +100,9 @@ namespace BPDZ
         [Command("Godmode", "Prevents the player from taking damage.", "Usage: /god [username]", new string[] { "godmode", "god" }, true)]
         public static void Godmode(Player player, string target)
         {
-            Player targetPlayer = Players.GetPlayerByUsername(target);
-            string list = "";
-            string[] allusers = File.ReadAllLines(GodListFile);
+            var targetPlayer = Players.GetPlayerByUsername(target);
+            var list = "";
+            var allusers = File.ReadAllLines(GodListFile);
 
             if (File.ReadAllText(GodListFile).Contains(targetPlayer.Username))
             {
@@ -134,7 +134,7 @@ namespace BPDZ
         [Command("Teleport", "Teleports you to another player.", "Usage: /tp [username]", new string[] { "tp", "teleport" }, true, true)]
         public static void TeleportToTarget(Player player, string target)
         {
-            Player targetPlayer = Players.GetPlayerByUsername(target);
+			var targetPlayer = Players.GetPlayerByUsername(target);
             player.Location = targetPlayer.Location;
             player.SendChatMessage(SvSendType.Self, $"<color=green>[BPDZ]</color> <color=red>Successfully teleported to {targetPlayer.Username}</color>");
         }
@@ -142,7 +142,7 @@ namespace BPDZ
         [Command("Teleport here", "Teleports a player to you.", "Usage: /tphere [username]", new string[] { "tph", "tphere" }, true, true)]
         public static void TeleportToSender(Player player, string target)
         {
-            Player targetPlayer = Players.GetPlayerByUsername(target);
+			var targetPlayer = Players.GetPlayerByUsername(target);
             targetPlayer.Location = player.Location;
             player.SendChatMessage(SvSendType.Self, $"<color=green>[BPDZ]</color> <color=red>Successfully teleported {targetPlayer.Username} to yourself</color>");
         }
@@ -150,7 +150,7 @@ namespace BPDZ
         [Command("Kick", "Disconnects a player from the server for 10mins", "Usage: /kick [playerID] [reason]", new string[] { "kick" }, true, true)]
         public static void KickPlayer(Player player, string target, string reason)
         {
-            Player targetPlayer = Players.GetPlayerByUsername(target);
+			var targetPlayer = Players.GetPlayerByUsername(target);
             targetPlayer.SendServerInfoMessage($"You were kicked by {player.Username} for {reason}");
             targetPlayer.Kick(reason);
             player.SendChatMessage(SvSendType.Self, $"<color=green>[BPDZ]</color> <color=red>Kicked {targetPlayer.Username} for {reason}</color>");
@@ -159,7 +159,7 @@ namespace BPDZ
         [Command("Ban", "Bans a player from the server", "Usage: /ban [playerID] [reason]", new string[] { "ban" }, true, true)]
         public static void BanPlayer(Player player, string target, string reason)
         {
-            Player targetPlayer = Players.GetPlayerByUsername(target);
+			var targetPlayer = Players.GetPlayerByUsername(target);
             targetPlayer.SendServerInfoMessage($"You were banned by {player.Username} for {reason}");
             targetPlayer.Ban(reason);
             player.SendChatMessage(SvSendType.Self, $"<color=green>[BPDZ]</color> <color=red>Banned {targetPlayer.Username} for {reason}</color>");
@@ -168,14 +168,14 @@ namespace BPDZ
         [Command("Discord Link", "Sends you the link to the discord server", "Usage: /discord", new string[] { "discord", "discordlink" }, true, true)]
         public static void SendDiscordLink(Player player)
         {
-            string discordlink = File.ReadAllText(@"BPDayZ/DiscordLink.txt");
+			var discordlink = File.ReadAllText(@"BPDayZ/DiscordLink.txt");
             player.svPlayer.Send(SvSendType.Self, Channel.Unsequenced, ClPacket.GameMessage, $"<color=green>[BPDayZ]:</color><color=yellow> {discordlink} </color>");
         }
 
         [Command("Help", "Opens a menu containing all commands", "Usage: /help", new string[] { "help" })]
         public static void SendHelpMenu(Player player)
         {
-            string text = "";
+			var text = "";
             foreach (var item in ListOfCommands)
             {
                 text = text + "\n" + item;
@@ -186,9 +186,9 @@ namespace BPDZ
         [Command("Mute", "Mutes a player on the server", "Usage: /mute [username] [reason]", new string[] { "mute" }, true)]
         public static void MutePlayer(Player player, string victim)
         {
-            string[] data = File.ReadAllLines(MuteFilePath);
-            Player targetPlayer = Players.GetPlayerByUsername(victim);
-            string list = "";
+			var data = File.ReadAllLines(MuteFilePath);
+			var targetPlayer = Players.GetPlayerByUsername(victim);
+			var list = "";
             if (data.Contains(victim))
             {
                 foreach(var user in data)

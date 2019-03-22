@@ -13,8 +13,8 @@ namespace BPDZ
         {
             if (!File.ReadAllLines(DayZCore.MuteFilePath).Contains(player.Username))
             {
-                string groupsdisplayname = "";
-                List<DayZGroups> groups = GroupGrabber(player).OrderByDescending(o => o.PermissionLevel).ToList();
+				var groupsdisplayname = "";
+				var groups = GroupGrabber(player).OrderByDescending(o => o.PermissionLevel).ToList();
                 foreach (var group in groups)
                 {
                     groupsdisplayname = $"{groupsdisplayname} <color={group.Color}>{group.DisplayName} </color>";
@@ -30,14 +30,14 @@ namespace BPDZ
 
         public static List<DayZGroups> GroupGrabber(Player player)
         {
-            string filepath = @"BPDayZ/Groups/";
-            List<DayZGroups> ListOfGroups = new List<DayZGroups>();
-            List<DayZGroups> playersGroups = new List<DayZGroups>();
-            DirectoryInfo directory = new DirectoryInfo(filepath);
+			var filepath = @"BPDayZ/Groups/";
+			var ListOfGroups = new List<DayZGroups>();
+			var playersGroups = new List<DayZGroups>();
+			var directory = new DirectoryInfo(filepath);
 
             foreach (var files in directory.GetFiles("*.txt"))
             {
-                string[] Contents = File.ReadAllLines(files.FullName);
+				var Contents = File.ReadAllLines(files.FullName);
                 ListOfGroups.Add(new DayZGroups { Name = files.Name, DisplayName = $"[{Path.GetFileNameWithoutExtension(files.FullName)}]", Color = Contents[0], PermissionLevel = Contents[1], Players = Contents});
             }
 
