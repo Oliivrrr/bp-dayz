@@ -12,19 +12,10 @@ namespace BPDZ
 {
     class Commandz
     {
-        public static List<string> ListOfCommands = new List<string>
-        {
-            @"/god [username] - toggles godmode for the player",
-            @"/help - displays the list of commands",
-            @"/home - teleports you to your house",
-            @"/safezone - teleports you to the nearest safezone",
-            @"/discord - shows the link to the discord server",
-            @"",
-            @"<color=yellow>More to come</color>"
-        };
         public static string GodListFile = @"BPDayZ/GodList.txt";
         public static string MuteFilePath = @"BPDayZ/MuteList.txt";
-
+        public static string CommandzFilePath = @"BPDayZ/HelpMessage.txt";
+        public static string[] ListOfCommands = File.ReadAllLines(CommandzFilePath);
 
         [Command("Godmode", "Prevents the player from taking damage.", "Usage: /god [username]", new string[] { "godmode", "god" }, true)]
         public static void Godmode(Player player, string message)
