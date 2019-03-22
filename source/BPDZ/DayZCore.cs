@@ -42,7 +42,7 @@ namespace BPDZ
             }
 
             SetResourceInfo();
-            PlayerzEvents();            
+            PlayerzEvents();
         }
         static void SetResourceInfo()
         {
@@ -69,11 +69,6 @@ namespace BPDZ
                 }
             }
             return false;
-        }
-
-        static void ZombieEvents()
-        {
-            PlayerEvents.OnNpcSpawned += Zombies.SetZombie;
         }
 
         static bool SvGlobalChatMessage(Player player, ref string message)
