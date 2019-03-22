@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UniversalUnityHooks;
-using Newtonsoft.Json;
-using System.IO;
-using BPDZ;
-using BP_API;
-using Newtonsoft.Json.Linq;
+﻿/*
+ * BPDayZ
+ *   A custom plugin for "Broke Protocol", with zombies.
+ * (c) Unlucky 2019
+ */
 
-namespace BPDayZ
+using System;
+
+
+namespace BPDZ
 {
     static class Zombies
     {

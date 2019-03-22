@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*
+ * BPDayZ
+ *   A custom plugin for "Broke Protocol", with zombies.
+ * (c) Unlucky 2019
+ */
+
+using System;
 
 namespace BPDZ
 {

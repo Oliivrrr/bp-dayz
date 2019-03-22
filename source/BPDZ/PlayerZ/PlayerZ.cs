@@ -1,23 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/*
+ * BPDayZ
+ *   A custom plugin for "Broke Protocol", with zombies.
+ * (c) Unlucky 2019
+ */
+
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UniversalUnityHooks;
-using UnityEngine;
-using Unity;
-using ENet;
 
 namespace BPDZ
 {
     public class PlayerZ
     {
         [Hook("ShPlayer.RemoveItemsDeath")]
-        public static bool RemoveItemsDeath(ShPlayer instance)
+        public static bool RemoveItemsDeath(ShPlayer player)
         {
-            foreach (InventoryItem inventoryItem in instance.myItems.Values.ToList<InventoryItem>())
+            foreach (InventoryItem inventoryItem in player.myItems.Values.ToList())
             {
-                instance.TransferItem(2, inventoryItem.item.index, instance.MyItemCount(inventoryItem.item.index), true);
+                player.TransferItem(DeltaInv.RemoveFromMe, inventoryItem.item.index, player.MyItemCount(inventoryItem.item.index), true);
             }
             return false;
         }

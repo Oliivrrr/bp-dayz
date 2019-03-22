@@ -1,56 +1,39 @@
-﻿using BP_API;
+﻿/*
+ * BPDayZ
+ *   A custom plugin for "Broke Protocol", with zombies.
+ * (c) Unlucky 2019
+ */
+
+using BP_API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using BPDayZ;
 using System.IO;
 using static BP_API.Core;
+using static BPDZ.Variables;
 
 namespace BPDZ
 {
-    class DayZCore
+    class Core
     {
-        public static string GodListFile = @"BPDayZ/GodList.txt";
-        public static string MuteFilePath = @"BPDayZ/MuteList.txt";
-        public static string CommandzFilePath = @"BPDayZ/HelpMessage.txt";
-        public static string[] ListOfCommands = File.ReadAllLines(CommandzFilePath);
-        public const string ResourceName = "BPDayZ";
-
-        [EntryPoint(ResourceName)]
+        [EntryPoint(resourceName)]
         public static void Main()
         {
-            Debug.Log($"[BPDZ] {ResourceName} being loaded in");
-            if (!Directory.Exists(@"BPDayZ"))
-            {
-                Debug.Log("[BPDZ] Creating directory BPDayZ...");
-                Directory.CreateDirectory("BPDayZ/Groups");
-                Debug.Log("[BPDZ] Successfully created directory");
-                Debug.Log("[BPDZ] Creating files...");
-                File.Create("BPDayZ/GodList.txt");
-                File.Create("BPDayZ/DiscordLink.txt");
-                File.Create("BPDayZ/HelpMessage.txt");
-                File.Create("BPDayZ/MuteList.txt");
-                Debug.Log("[BPDZ] Successfully created files");
-            }
-
-            else
-            {
-                Debug.Log("[BPDZ] All resources loaded");
-            }
-
+			Util.Log(resourceName + " is being loaded in!");
+			Util.ValidateFiles();
+			Util.ReadFiles();
             SetResourceInfo();
-            PlayerzEvents();
+            RegisterEvents();
         }
         static void SetResourceInfo()
         {
-            BP_API.Core.Resources[ResourceName].ResourceInfo.Author = "Unlucky";
-            BP_API.Core.Resources[ResourceName].ResourceInfo.Description = "A DayZ plugin created by Unlucky";
+            BP_API.Core.Resources[resourceName].ResourceInfo.Author = "Unlucky";
+            BP_API.Core.Resources[resourceName].ResourceInfo.Description = "A DayZ plugin created by Unlucky";
         }
-
-        static void PlayerzEvents()
+        static void RegisterEvents()
         {
             PlayerEvents.OnPlayerConnected += OnPlayerConnected;
             PlayerEvents.OnPlayerDisconnected += OnPlayerDisconnected;
@@ -60,26 +43,25 @@ namespace BPDZ
 
         static bool OnPlayerDamage(Player player, Player attacker, ref DamageIndex type, ref float amount, ref Collider collider)
         {
-            foreach (var name in File.ReadAllLines(GodListFile))
-            {
-                if (name == player.Username)
-                {
-                    player.SendChatMessage(SvSendType.Self, $"<color=white>Blocked {amount}HP of damage</color>");
-                    return true;
-                }
-            }
+			foreach (var name in Lists.GoddedPlayers)
+			{
+				if (name != player.Username)
+					continue;
+				player.SendChatMessage($"<color=#fff>Blocked {amount}HP of damage</color>");
+				return true;
+			}
             return false;
         }
 
         static bool SvGlobalChatMessage(Player player, ref string message)
         {
-            DayZManager.SvGlobalChatMessage(player, message);
-            Loggers.Chat.Log($"[{player.svPlayer.player.ID}]  {player.svPlayer.player.username}: {message}");
+            Manager.SvGlobalChatMessage(player, message);
+            Loggers.Chat.Log($"[{player.ID}]  {player.FilteredUsername}: {message.FilterString()}");
             return true;
         }
         static void OnPlayerConnected(Player player)
         {
-            Debug.Log($"[{player.ID}] {player.Username} Joined the server ({player.UserData.GetIpV4()})");
+            Loggers.Misc.Log($"[{player.ID}] {player.Username} Joined the server ({player.UserData.GetIpV4()})");
             if (player.svPlayer.playerData.username != null)
                 return;
             player.Inventory.AddItem(-1975896234, 1);
@@ -89,15 +71,14 @@ namespace BPDZ
 
         static void OnPlayerDisconnected(Player player)
         {
-            Debug.Log($"[{player.ID}] {player.Username} Left the server");
+			Loggers.Misc.Log($"[{player.ID}] {player.Username} Left the server");
         }
 
-        public static int RNG(int min, int max)
-        {
-            return UnityEngine.Random.Range(min, max);
-        }
+        public static int GenerateRandom(int min, int max) => Variables.Random.Next(min, max);
 
-        [Command("Godmode", "Prevents the player from taking damage.", "Usage: /god [username]", new string[] { "godmode", "god" }, true)]
+
+
+		[Command("Godmode", "Prevents the player from taking damage.", "Usage: /god [username]", new string[] { "godmode", "god" }, true)]
         public static void Godmode(Player player, string target)
         {
             var targetPlayer = Players.GetPlayerByUsername(target);
@@ -114,7 +95,7 @@ namespace BPDZ
                     }
                 }
                 File.WriteAllText(GodListFile, list);
-                player.SendChatMessage(SvSendType.Self, $"<color=green>[BPDZ]</color> <color=red>Successfully removed godmode from {targetPlayer.Username}</color>");
+                player.SendChatMessage($"<color=green>[BPDZ]</color> <color=red>Successfully removed godmode from {targetPlayer.Username}</color>");
             }
             else
             {
@@ -172,16 +153,17 @@ namespace BPDZ
             player.svPlayer.Send(SvSendType.Self, Channel.Unsequenced, ClPacket.GameMessage, $"<color=green>[BPDayZ]:</color><color=yellow> {discordlink} </color>");
         }
 
-        [Command("Help", "Opens a menu containing all commands", "Usage: /help", new string[] { "help" })]
-        public static void SendHelpMenu(Player player)
-        {
-			var text = "";
-            foreach (var item in ListOfCommands)
-            {
-                text = text + "\n" + item;
-            }
-            player.svPlayer.Send(SvSendType.Self, Channel.Fragmented, ClPacket.ServerInfo, $"<color=green>[BPDayZ] List of commands </color> " + text);
-        }
+   // todo
+   //     [Command("Help", "Opens a menu containing all commands", "Usage: /help", new string[] { "help" })]
+   //     public static void SendHelpMenu(Player player)
+   //     {
+			//var text = "";
+   //         foreach (var item in ListOfCommands)
+   //         {
+   //             text = text + "\n" + item;
+   //         }
+   //         player.svPlayer.Send(SvSendType.Self, Channel.Fragmented, ClPacket.ServerInfo, $"<color=green>[BPDayZ] List of commands </color> " + text);
+   //     }
 
         [Command("Mute", "Mutes a player on the server", "Usage: /mute [username] [reason]", new string[] { "mute" }, true)]
         public static void MutePlayer(Player player, string victim)
