@@ -32,17 +32,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\BROKE PROTOCOL\BrokeProtocol_Data\Managed\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\BrokeProtocol_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="BP-API, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Plugins\BP-API.dll</HintPath>
+    <Reference Include="BP-API">
+      <HintPath>..\..\BrokeProtocol_Data\Managed\BP-API.dll</HintPath>
     </Reference>
-    <Reference Include="HookAttribute, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Downloads\HookAttribute.dll</HintPath>
+    <Reference Include="HookAttribute">
+      <HintPath>..\..\BrokeProtocol_Data\Managed\HookAttribute.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Posix">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\BROKE PROTOCOL\BrokeProtocol_Data\Managed\Mono.Posix.dll</HintPath>
@@ -51,10 +48,11 @@
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\BROKE PROTOCOL\BrokeProtocol_Data\Managed\Mono.Security.dll</HintPath>
     </Reference>
     <Reference Include="NavMeshComponents">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\BROKE PROTOCOL\BrokeProtocol_Data\Managed\NavMeshComponents.dll</HintPath>
+      <HintPath>..\..\BrokeProtocol_Data\Managed\NavMeshComponents.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BrokeProtocol_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -100,9 +98,6 @@
     <Reference Include="UnityEngine.ClothModule">
       <HintPath>..\..\BrokeProtocol_Data\Managed\UnityEngine.ClothModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.CloudWebServicesModule">
-      <HintPath>..\..\BrokeProtocol_Data\Managed\UnityEngine.CloudWebServicesModule.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.ClusterInputModule">
       <HintPath>..\..\BrokeProtocol_Data\Managed\UnityEngine.ClusterInputModule.dll</HintPath>
     </Reference>
@@ -117,9 +112,6 @@
     </Reference>
     <Reference Include="UnityEngine.DirectorModule">
       <HintPath>..\..\BrokeProtocol_Data\Managed\UnityEngine.DirectorModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.FacebookModule">
-      <HintPath>..\..\BrokeProtocol_Data\Managed\UnityEngine.FacebookModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.FileSystemHttpModule">
       <HintPath>..\..\BrokeProtocol_Data\Managed\UnityEngine.FileSystemHttpModule.dll</HintPath>
@@ -150,9 +142,6 @@
     </Reference>
     <Reference Include="UnityEngine.Networking">
       <HintPath>..\..\BrokeProtocol_Data\Managed\UnityEngine.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ParticlesLegacyModule">
-      <HintPath>..\..\BrokeProtocol_Data\Managed\UnityEngine.ParticlesLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
       <HintPath>..\..\BrokeProtocol_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
@@ -276,14 +265,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DayZManager.cs" />
-    <Compile Include="Types\DayZGroups.cs" />
-    <Compile Include="Types\GunIndex.cs" />
+    <Compile Include="Manager.cs" />
+    <Compile Include="Models\DayZGroups.cs" />
+    <Compile Include="Models\GunIndex.cs" />
     <Compile Include="PlayerZ\LootDrops.cs" />
     <Compile Include="PlayerZ\PlayerZ.cs" />
-    <Compile Include="DayZCore.cs" />
+    <Compile Include="Core.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PlayerZ\Zombies.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="Variables.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\ammoindex.json" />
