@@ -26,12 +26,13 @@ namespace BPDZ
             if (!Directory.Exists(@"BPDayZ"))
             {
                 Debug.Log("[BPDZ] Creating directory BPDayZ...");
-                Directory.CreateDirectory("BPDayZ/Index");
                 Directory.CreateDirectory("BPDayZ/Groups");
                 Debug.Log("[BPDZ] Successfully created directory");
                 Debug.Log("[BPDZ] Creating files...");
                 File.Create("BPDayZ/GodList.txt");
                 File.Create("BPDayZ/DiscordLink.txt");
+                File.Create("BPDayZ/HelpMessage.txt");
+                File.Create("BPDayZ/MuteList.txt");
                 Debug.Log("[BPDZ] Successfully created files");
             }
 
