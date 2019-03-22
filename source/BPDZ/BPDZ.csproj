@@ -277,7 +277,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DayZManager.cs" />
-    <Compile Include="PlayerZ\Commandz.cs" />
     <Compile Include="Types\DayZGroups.cs" />
     <Compile Include="Types\GunIndex.cs" />
     <Compile Include="PlayerZ\LootDrops.cs" />
