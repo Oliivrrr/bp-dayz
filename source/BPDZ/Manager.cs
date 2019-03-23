@@ -55,7 +55,7 @@ namespace BPDZ
 			if (!player.svPlayer.svManager.chatted.OverLimit(player.svPlayer.player))
 			{
 				player.svPlayer.svManager.chatted.Add(player.svPlayer.player);
-				player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GameMessage, $"[{player.ID}] {groupsdisplayname} {player.svPlayer.player.username}: {message}");
+				player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GameMessage, $"<color=#C4C4C4>[{player.ID}]</color> {groupsdisplayname} {player.svPlayer.player.username}: {message}");
 			}
 		}
 	}
