@@ -14,6 +14,7 @@ using UnityEngine;
 using System.IO;
 using static BP_API.Core;
 using static BPDZ.Variables;
+using System.Collections;
 
 namespace BPDZ
 {
@@ -39,6 +40,35 @@ namespace BPDZ
             PlayerEvents.OnPlayerDisconnected += OnPlayerDisconnected;
             PlayerEvents.OnPlayerDamage += OnPlayerDamage;
             PlayerEvents.OnGlobalChatMessage += SvGlobalChatMessage;
+            PlayerEvents.OnPlayerCrime += OnPlayerCrime;
+        }
+
+        static bool OnPlayerCrime(Player player, ref byte crimeIndex, ref ShEntity victim)
+        {
+            if (crimeIndex == CrimeIndex.Murder)
+            {
+                if (!player.IsServerSide() && !victim.svEntity.serverside)
+                {
+                    player.SendChatMessage(SvSendType.All, $"<color=red>Player {player.Username} killed {Players.GetPlayerByID(victim.ID).Username} using {player.shPlayer.curEquipable.itemName}</color>");
+                    Debug.Log($"[BPDZ] {player.Username} killed {Players.GetPlayerByID(victim.ID).Username}");
+                }
+                else if (player.IsServerSide() && !victim.svEntity.serverside)
+                {
+                    player.SendChatMessage(SvSendType.All, $"<color=red>{Players.GetPlayerByID(victim.ID).Username} was killed by a zombie</color>");
+                }
+            }
+
+            /* Need to find a way to locate restricted area colliders - Unlucky
+            if (crimeIndex == CrimeIndex.Trespassing && player.shPlayer.curWearables[0].ID != -1627168389)
+            {
+                while (player.shPlayer.headCollider.bounds.Intersects( blah blah find a way))
+                {
+                    player.svPlayer.Damage(DamageIndex.Null, 5, player.shPlayer, player.shPlayer.headCollider);
+                    Debug.Log("Damaged");
+                }
+            }*/
+
+            return true;
         }
 
         static bool OnPlayerDamage(Player player, Player attacker, ref DamageIndex type, ref float amount, ref Collider collider)
@@ -75,8 +105,6 @@ namespace BPDZ
         }
 
         public static int GenerateRandom(int min, int max) => Variables.Random.Next(min, max);
-
-
 
         [Command("Godmode", "Prevents the player from taking damage.", "Usage: /god [username]", new string[] { "godmode", "god" }, true)]
         public static void Godmode(Player player, string target)
