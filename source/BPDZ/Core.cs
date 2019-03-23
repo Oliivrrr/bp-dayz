@@ -2,6 +2,7 @@
  * BPDayZ
  *   A custom plugin for "Broke Protocol", with zombies.
  * (c) Unlucky 2019
+ *
  */
 
 using BP_API;
@@ -14,7 +15,6 @@ using UnityEngine;
 using System.IO;
 using static BP_API.Core;
 using static BPDZ.Variables;
-using System.Collections;
 
 namespace BPDZ
 {
@@ -40,40 +40,11 @@ namespace BPDZ
             PlayerEvents.OnPlayerDisconnected += OnPlayerDisconnected;
             PlayerEvents.OnPlayerDamage += OnPlayerDamage;
             PlayerEvents.OnGlobalChatMessage += SvGlobalChatMessage;
-            PlayerEvents.OnPlayerCrime += OnPlayerCrime;
-        }
-
-        static bool OnPlayerCrime(Player player, ref byte crimeIndex, ref ShEntity victim)
-        {
-            if (crimeIndex == CrimeIndex.Murder)
-            {
-                if (!player.IsServerSide() && !victim.svEntity.serverside)
-                {
-                    player.SendChatMessage(SvSendType.All, $"<color=red>Player {player.Username} killed {Players.GetPlayerByID(victim.ID).Username} using {player.shPlayer.curEquipable.itemName}</color>");
-                    Debug.Log($"[BPDZ] {player.Username} killed {Players.GetPlayerByID(victim.ID).Username}");
-                }
-                else if (player.IsServerSide() && !victim.svEntity.serverside)
-                {
-                    player.SendChatMessage(SvSendType.All, $"<color=red>{Players.GetPlayerByID(victim.ID).Username} was killed by a zombie</color>");
-                }
-            }
-
-            /* Need to find a way to locate restricted area colliders - Unlucky
-            if (crimeIndex == CrimeIndex.Trespassing && player.shPlayer.curWearables[0].ID != -1627168389)
-            {
-                while (player.shPlayer.headCollider.bounds.Intersects( blah blah find a way))
-                {
-                    player.svPlayer.Damage(DamageIndex.Null, 5, player.shPlayer, player.shPlayer.headCollider);
-                    Debug.Log("Damaged");
-                }
-            }*/
-
-            return true;
         }
 
         static bool OnPlayerDamage(Player player, Player attacker, ref DamageIndex type, ref float amount, ref Collider collider)
         {
-            foreach (var name in Lists.GoddedPlayers)
+            foreach (var name in FileData.GoddedPlayers)
             {
                 if (name != player.Username)
                     continue;
@@ -106,122 +77,71 @@ namespace BPDZ
 
         public static int GenerateRandom(int min, int max) => Variables.Random.Next(min, max);
 
-        [Command("Godmode", "Prevents the player from taking damage.", "Usage: /god [username]", new string[] { "godmode", "god" }, true)]
-        public static void Godmode(Player player, string target)
-        {
-            var targetPlayer = Players.GetPlayerByUsername(target);
-            var list = "";
-            var allusers = File.ReadAllLines(GodListFile);
 
-            if (File.ReadAllText(GodListFile).Contains(targetPlayer.Username))
+
+        [Command(nameof(Godmode), "Prevents the player from taking damage.", "Usage: /god [username]", new string[] { "godmode", "god" }, true)]
+        public static void Godmode(Player player, Player target)
+        {
+            var msg = $"Successfully {{0}} godmode for {target.FilteredUsername}.";
+            if (FileData.GoddedPlayers.Contains(target.Username))
             {
-                foreach (var user in allusers)
-                {
-                    if (user != targetPlayer.Username)
-                    {
-                        list = $"{list} \n {user}";
-                    }
-                }
-                File.WriteAllText(GodListFile, list);
-                player.SendChatMessage($"<color=green>[BPDZ]</color> <color=red>Successfully removed godmode from {targetPlayer.Username}</color>");
+                FileData.GoddedPlayers.Remove(target.Username);
+                Util.ListToFile(FileData.GoddedPlayers, GodListFile);
+                player.SendSuccessMessage(string.Format(msg, "removed"));
+                return;
             }
-            else
-            {
-                foreach (var user in allusers)
-                {
-                    if (user != player.Username)
-                    {
-                        list = $"{list}\n{user}";
-                    }
-                }
-                list = $"{list}\n{targetPlayer.Username}";
-                File.WriteAllText(GodListFile, list);
-                player.SendChatMessage(SvSendType.Self, $"<color=green>[BPDZ]</color> <color=red>Successfully gave godmode to {targetPlayer.Username}</color>");
-            }
+            FileData.GoddedPlayers.Add(target.Username);
+            File.AppendAllText(GodListFile, target.Username + Environment.NewLine);
+            player.SendSuccessMessage(string.Format(msg, "gave"));
         }
 
-        [Command("Teleport", "Teleports you to another player.", "Usage: /tp [username]", new string[] { "tp", "teleport" }, true, true)]
-        public static void TeleportToTarget(Player player, string target)
+        [Command(nameof(TeleportToTarget), "Teleports you to another player.", "Usage: /tp [username]", new string[] { "tp", "teleport" }, true, true)]
+        public static void TeleportToTarget(Player player, Player target)
         {
-            var targetPlayer = Players.GetPlayerByUsername(target);
-            player.Location = targetPlayer.Location;
-            player.SendChatMessage(SvSendType.Self, $"<color=green>[BPDZ]</color> <color=red>Successfully teleported to {targetPlayer.Username}</color>");
+            player.Location.SetPosition(target.Location.GetPosition());
+            player.SendSuccessMessage($"Successfully teleported to {target.FilteredUsername}");
         }
 
-        [Command("Teleport here", "Teleports a player to you.", "Usage: /tphere [username]", new string[] { "tph", "tphere" }, true, true)]
-        public static void TeleportToSender(Player player, string target)
+        [Command(nameof(TeleportToSender), "Teleports a player to you.", "Usage: /tphere [username]", new string[] { "tph", "tphere" }, true, true)]
+        public static void TeleportToSender(Player player, Player target)
         {
-            var targetPlayer = Players.GetPlayerByUsername(target);
-            targetPlayer.Location = player.Location;
-            player.SendChatMessage(SvSendType.Self, $"<color=green>[BPDZ]</color> <color=red>Successfully teleported {targetPlayer.Username} to yourself</color>");
+            target.Location.SetPosition(player.Location.GetPosition());
+            player.SendSuccessMessage($"Successfully teleported {target.FilteredUsername} to yourself.");
         }
-
         [Command("Kick", "Disconnects a player from the server for 10mins", "Usage: /kick [playerID] [reason]", new string[] { "kick" }, true, true)]
-        public static void KickPlayer(Player player, string target, string reason)
+        public static void KickPlayer(Player player, Player target, string reason)
         {
-            var targetPlayer = Players.GetPlayerByUsername(target);
-            targetPlayer.SendServerInfoMessage($"You were kicked by {player.Username} for {reason}");
-            targetPlayer.Kick(reason);
-            player.SendChatMessage(SvSendType.Self, $"<color=green>[BPDZ]</color> <color=red>Kicked {targetPlayer.Username} for {reason}</color>");
+            target.Kick(reason);
+            player.SendSuccessMessage($"Successfully kicked {target.FilteredUsername} for {reason}.");
         }
 
         [Command("Ban", "Bans a player from the server", "Usage: /ban [playerID] [reason]", new string[] { "ban" }, true, true)]
-        public static void BanPlayer(Player player, string target, string reason)
+        public static void BanPlayer(Player player, Player target, string reason)
         {
-            var targetPlayer = Players.GetPlayerByUsername(target);
-            targetPlayer.SendServerInfoMessage($"You were banned by {player.Username} for {reason}");
-            targetPlayer.Ban(reason);
-            player.SendChatMessage(SvSendType.Self, $"<color=green>[BPDZ]</color> <color=red>Banned {targetPlayer.Username} for {reason}</color>");
+            target.Ban(reason);
+            player.SendSuccessMessage($"Successfully banned {target.FilteredUsername} for {reason}.");
         }
 
         [Command("Discord Link", "Sends you the link to the discord server", "Usage: /discord", new string[] { "discord", "discordlink" }, true, true)]
         public static void SendDiscordLink(Player player)
         {
-            var discordlink = File.ReadAllText(@"BPDayZ/DiscordLink.txt");
-            player.svPlayer.Send(SvSendType.Self, Channel.Unsequenced, ClPacket.GameMessage, $"<color=green>[BPDayZ]:</color><color=yellow> {discordlink} </color>");
+            player.SendInfoMessage($"Discord link: (link here)");
         }
 
-   // todo
-   //     [Command("Help", "Opens a menu containing all commands", "Usage: /help", new string[] { "help" })]
-   //     public static void SendHelpMenu(Player player)
-   //     {
-            //var text = "";
-   //         foreach (var item in ListOfCommands)
-   //         {
-   //             text = text + "\n" + item;
-   //         }
-   //         player.svPlayer.Send(SvSendType.Self, Channel.Fragmented, ClPacket.ServerInfo, $"<color=green>[BPDayZ] List of commands </color> " + text);
-   //     }
-
-        [Command("Mute", "Mutes a player on the server", "Usage: /mute [username] [reason]", new string[] { "mute" }, true)]
-        public static void MutePlayer(Player player, string victim)
+        [Command("Mute", "Mutes a player on the server", "Usage: /mute [username]", new string[] { "mute" }, true)]
+        public static void MutePlayer(Player player, Player target)
         {
-            var data = File.ReadAllLines(MuteFilePath);
-            var targetPlayer = Players.GetPlayerByUsername(victim);
-            var list = "";
-            if (data.Contains(victim))
+            var msg = $"Successfully {{0}} {target.FilteredUsername}.";
+            if (FileData.MutedPlayers.Contains(target.Username))
             {
-                foreach(var user in data)
-                {
-                    if (user != victim)
-                    {
-                        list = $"{list}\n{user}";
-                    }
-                }
-                File.WriteAllText(MuteFilePath, list);
-                player.SendChatMessage(SvSendType.Self, $"<color=green>[BPDZ]</color> <color=red>Successfully unmuted {targetPlayer.Username}</color>");
+                FileData.MutedPlayers.Remove(target.Username);
+                Util.ListToFile(FileData.MutedPlayers, MuteFilePath);
+                player.SendSuccessMessage(string.Format(msg, "unmuted"));
+                return;
             }
-
-            else
-            {
-                foreach (var user in data)
-                {
-                    list = $"{list}\n{user}";
-                }
-                list = $"{list}\n{victim}";
-                File.WriteAllText(MuteFilePath, list);
-                player.SendChatMessage(SvSendType.Self, $"<color=green>[BPDZ]</color> <color=red>Successfully muted {targetPlayer.Username}</color>");
-            }
+            FileData.MutedPlayers.Add(target.Username);
+            File.AppendAllText(MuteFilePath, target.Username + Environment.NewLine);
+            player.SendSuccessMessage(string.Format(msg, "muted"));
         }
     }
 }
