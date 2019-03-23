@@ -265,6 +265,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Manager.cs" />
     <Compile Include="Models\DayZGroups.cs" />
     <Compile Include="Models\GunIndex.cs" />
@@ -288,6 +289,6 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetFileName)" "..\..\..\..\..\Plugins\"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetFileName)" "..\..\..\..\Plugins\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

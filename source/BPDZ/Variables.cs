@@ -30,7 +30,9 @@ namespace BPDZ
 		public static bool IsPreRelease => Version.Contains("pre");
 		public static bool IsDevelopmentBuild => Version.Contains("dev");
 
-		public static class Lists
+
+
+		public static class FileData
 		{
 			public static List<string> GoddedPlayers = new List<string>();
 			public static List<string> MutedPlayers = new List<string>();

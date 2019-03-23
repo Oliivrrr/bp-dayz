@@ -60,8 +60,18 @@ namespace BPDZ
 		/// </summary>
 		public static void ReadFiles()
 		{
-			Lists.GoddedPlayers = File.ReadAllLines(GodListFile).ToList();
-			Lists.MutedPlayers = File.ReadAllLines(MuteFilePath).ToList();
+			FileData.GoddedPlayers = File.ReadAllLines(GodListFile).ToList();
+			FileData.MutedPlayers = File.ReadAllLines(MuteFilePath).ToList();
 		}
+
+        /// <summary>
+        /// Writes an list to a file, every entry on a new line.
+        /// </summary>
+        /// <param name="list">The list that will be used.</param>
+        /// <param name="fileName">The file that the list will be written to. If it does already exist, it'll be overwritten.</param>
+        public static void ListToFile(IEnumerable<string> list, string fileName)
+        {
+            File.WriteAllLines(fileName, list);
+        }
 	}
 }

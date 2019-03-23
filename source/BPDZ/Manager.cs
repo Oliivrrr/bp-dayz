@@ -40,7 +40,7 @@ namespace BPDZ
 		}
 		public static void SvGlobalChatMessage(Player player, string message)
 		{
-			if (Lists.MutedPlayers.Contains(player.Username))
+			if (FileData.MutedPlayers.Contains(player.Username))
 			{
 				player.SendChatMessage($"&cYou are currently muted.");
 				return;
