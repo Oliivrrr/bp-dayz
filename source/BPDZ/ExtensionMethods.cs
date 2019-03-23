@@ -1,4 +1,11 @@
-﻿using BP_API;
+﻿/*
+ * BPDayZ
+ *   A custom plugin for "Broke Protocol", with zombies.
+ * (c) Unlucky 2019
+ *
+ */
+
+using BP_API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
