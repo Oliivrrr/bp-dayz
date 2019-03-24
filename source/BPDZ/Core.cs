@@ -106,7 +106,12 @@ namespace BPDZ
 
         public static int GenerateRandom(int min, int max) => Variables.Random.Next(min, max);
 
-
+        [Command(nameof(SpawnNPC), "Spawn an npc.", "Usage: /spawn [NPCid]", new string[] { "spawn" }, true, true)]
+        public static void SpawnNPC(Player player, int id)
+        {
+            player.svPlayer.svManager.AddNewEntity(player.shPlayer.manager.skinPrefabs[id], player.shPlayer.GetPlace(), player.shPlayer.GetPosition(), player.shPlayer.GetRotation(), false);
+            player.SendSuccessMessage($"Success!");
+        }
 
         [Command(nameof(Godmode), "Prevents the player from taking damage.", "Usage: /god [username]", new string[] { "godmode", "god" }, true)]
         public static void Godmode(Player player, Player target)
