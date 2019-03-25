@@ -91,9 +91,12 @@ namespace BPDZ
         }
         static void OnPlayerConnected(Player player)
         {
-            Loggers.Misc.Log($"[{player.ID}] {player.Username} Joined the server ({player.UserData.GetIpV4()})");
             if (player.svPlayer.playerData.username != null)
+            {
+                Loggers.Misc.Log($"[{player.ID}] {player.Username} Joined the server ({player.UserData.GetIpV4()})");
                 return;
+            }
+            Loggers.Misc.Log($"[{player.ID}] {player.Username} Registered ({player.UserData.GetIpV4()})");
             player.Inventory.AddItem(-1975896234, 1);
             player.Inventory.AddItem(-1627168389, 1);
             player.Inventory.AddItem(493970259, 35);
@@ -110,7 +113,7 @@ namespace BPDZ
         public static void SpawnNPC(Player player, int id)
         {
             player.svPlayer.svManager.AddNewEntity(player.shPlayer.manager.skinPrefabs[id], player.shPlayer.GetPlace(), player.shPlayer.GetPosition(), player.shPlayer.GetRotation(), false);
-            player.SendSuccessMessage($"Success!");
+            player.SendSuccessMessage($"Successfully Spawned NPC!");
         }
 
         [Command(nameof(Godmode), "Prevents the player from taking damage.", "Usage: /god [username]", new string[] { "godmode", "god" }, true)]
@@ -153,6 +156,7 @@ namespace BPDZ
         public static void BanPlayer(Player player, Player target, string reason)
         {
             target.Ban(reason);
+            player.SendChatMessage(SvSendType.All, $"<color=green>{player.Username} banned {target.Username} for {reason}</color>");
             player.SendSuccessMessage($"Successfully banned {target.FilteredUsername} for {reason}.");
         }
 
