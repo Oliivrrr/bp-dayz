@@ -8,18 +8,18 @@
 
 namespace BPDZ
 {
-    public class Meekling : ZombieType
+    public class Runner : ZombieType
     {
         SvPlayer Player { get; set; }
-        public Meekling(SvPlayer player) : base(player)
+        public Runner(SvPlayer player) : base(player)
         {
             Player = player;
-            DisplayName = "Meekling";
-            Rarity = 0.65f;
-            Health = 120;
+            DisplayName = "Runner";
+            Rarity = 0.25f;
+            Health = 135;
             DamageMultiplier = 1f;
-            RunSpeed = 1.35f;
-            WalkSpeed = 1.25f;
+            RunSpeed = 3.25f;
+            WalkSpeed = 1.5f;
         }
     }
 }

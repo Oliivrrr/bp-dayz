@@ -15,8 +15,8 @@ namespace BPDZ
         {
             Player = player;
         }
-        public float WalkSpeed { get; set; }
-        public float RunSpeed { get; set; }
+        public string DisplayName { get; set; }
+        public float Rarity { get; set; }
         public float Health
         {
             get
@@ -28,5 +28,8 @@ namespace BPDZ
                 Player.player.health = value;
             }
         }
+        public float DamageMultiplier { get; set; }
+        public float WalkSpeed { get; set; }
+        public float RunSpeed { get; set; }
     }
 }

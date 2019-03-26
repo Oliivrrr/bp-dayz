@@ -273,7 +273,10 @@
     <Compile Include="PlayerZ\PlayerZ.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Zombie\Types\Slug.cs" />
     <Compile Include="Zombie\Types\Meekling.cs" />
+    <Compile Include="Zombie\Types\Runner.cs" />
+    <Compile Include="Zombie\Types\ZombieKing.cs" />
     <Compile Include="Zombie\Zombie.cs" />
     <Compile Include="Zombie\Zombies.cs" />
     <Compile Include="Util.cs" />
