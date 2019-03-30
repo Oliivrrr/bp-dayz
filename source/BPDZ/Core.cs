@@ -15,6 +15,8 @@ using UnityEngine;
 using System.IO;
 using static BP_API.Core;
 using static BPDZ.Variables;
+using System.Collections;
+using Logger = BP_API.Logger;
 
 namespace BPDZ
 {
@@ -41,6 +43,32 @@ namespace BPDZ
             PlayerEvents.OnPlayerDamage += OnPlayerDamage;
             PlayerEvents.OnGlobalChatMessage += SvGlobalChatMessage;
             PlayerEvents.OnPlayerCrime += OnPlayerCrime;
+            PlayerEvents.OnNpcSpawned += OnNpcSpawned;
+            ServerEvents.OnStartServer += OnStartServer;
+        }
+
+        static void OnStartServer(SvManager svMan)
+        {
+            svMan.startMoney = 0;
+            svMan.StartCoroutine(DayZLoop(SvMan));
+        }
+
+        private static IEnumerator DayZLoop(SvManager svMan)
+        {
+            while (true)
+            {
+                yield return new WaitForSeconds(60);
+                ShPlayer randomPlayer = svMan.GetRandomRealPlayer();
+                if (randomPlayer != null && randomPlayer.ground)
+                {
+                    LootDrops.Initialize(Players.GetPlayerByID(svMan.GetRandomRealPlayer().ID));
+                }
+            }
+        }
+
+        static bool OnNpcSpawned(Player player, ref Vector3 position, ref Quaternion rotation, ref Place place, ref Waypoint node, ref ShPlayer spawner, ref ShEntity mount, ref ShPlayer enemy)
+        {
+            return true;
         }
 
         static bool OnPlayerCrime(Player player, ref byte crimeIndex, ref ShEntity victim)
@@ -93,10 +121,11 @@ namespace BPDZ
         {
             if (player.svPlayer.playerData.username != null)
             {
-                Loggers.Misc.Log($"[{player.ID}] {player.Username} Joined the server ({player.UserData.GetIpV4()})");
+                Loggers.Chat.Log($"[{player.ID}] {player.Username} Joined the server ({player.UserData.GetIpV4()})");
                 return;
             }
             Loggers.Misc.Log($"[{player.ID}] {player.Username} Registered ({player.UserData.GetIpV4()})");
+            player.SendChatMessage(SvSendType.All, $"{player.Username} Registered!");
             player.Inventory.AddItem(-1975896234, 1);
             player.Inventory.AddItem(-1627168389, 1);
             player.Inventory.AddItem(493970259, 35);
@@ -107,13 +136,52 @@ namespace BPDZ
             Loggers.Misc.Log($"[{player.ID}] {player.Username} Left the server");
         }
 
-        public static int GenerateRandom(int min, int max) => Variables.Random.Next(min, max);
+        public static Vector3 RandomPosition(Vector3 curPosition)
+        {
+            int num = ChooseInt(-1,1);
+            Vector3 finalPosition = new Vector3(curPosition.x + 8 * num, curPosition.y, curPosition.z + 8 * num);
+            return finalPosition;
+        }
 
-        [Command(nameof(SpawnNPC), "Spawn a Zombie.", "Usage: /spawnzombie [TypeID]", new string[] { "spawnzombie", "zombie", "sz" }, true, true)]
+        public static IEnumerator KillDelay(ShEntity entity, float time)
+        {
+            yield return new WaitForSeconds(time);
+            entity.Destroy();
+        }
+
+        public static int GenerateRandom(int min, int max) => Variables.Random.Next(min, max);
+        public static float GenerateRandomF(float min, float max) => UnityEngine.Random.Range(min, max);
+
+        public static int ChooseInt(int option1, int option2)
+        {
+            int num = GenerateRandom(0, 1);
+            if (num == 0)
+            {
+                return option1;
+            }
+            else
+            {
+                return option2;
+            }
+        }
+
+        [Command(nameof(SpawnNPC), "Spawn a Zombie.", "Usage: /spawnzombie [TypeID]", new string[] { "spawnzombie", "zombie"}, true, true)]
         public static void SpawnNPC(Player player, int id)
         {
-            player.svPlayer.svManager.AddNewEntity(player.shPlayer.manager.skinPrefabs[id], player.shPlayer.GetPlace(), player.shPlayer.GetPosition(), player.shPlayer.GetRotation(), false);
+            ShEntity Zombie = player.svPlayer.svManager.AddNewEntity(player.shPlayer.manager.skinPrefabs[id], player.shPlayer.GetPlace(), player.shPlayer.GetPosition(), player.shPlayer.GetRotation(), false);
+            foreach (var item in Zombie.myItems.Values)
+            {
+                Zombie.RemoveFromMyItems(item.item.ID, item.count);
+            }
             player.SendSuccessMessage($"Successfully Spawned Zombie!");
+        }
+
+        [Command(nameof(SpawnLootDrop), "Spawn a Loot Drop.", "Usage: /spawndrop [Tier]", new string[] { "spawndrop", "lootdrop" }, true, true)]
+        public static void SpawnLootDrop(Player player, int id)
+        {
+            ShEntity Zombie = player.svPlayer.svManager.AddNewEntity(player.shPlayer.manager.skinPrefabs[1], player.shPlayer.GetPlace(), player.shPlayer.GetPosition(), player.shPlayer.GetRotation(), false);
+            LootDrops.Initialize(Players.GetPlayerByID(Zombie.ID));
+            player.SendSuccessMessage($"Successfully Spawned Loot Drop!");
         }
 
         [Command(nameof(Godmode), "Prevents the player from taking damage.", "Usage: /god [username]", new string[] { "godmode", "god" }, true)]

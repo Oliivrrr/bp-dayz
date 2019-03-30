@@ -27,7 +27,7 @@ namespace BPDZ
 		public static string MuteFilePath { get; } = Path.Combine(RootFolder, "MuteList.txt");
 		public static Random Random { get; } = new Random();
 
-		public static string Version { get; private set; } = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+        public static string Version { get; private set; } = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
 		public static bool IsPreRelease => Version.Contains("pre");
 		public static bool IsDevelopmentBuild => Version.Contains("dev");
 
