@@ -52,7 +52,7 @@ namespace BPDZ
 				File.Create("BPDayZ/DiscordLink.txt");
 				File.Create("BPDayZ/HelpMessage.txt");
 				File.Create("BPDayZ/MuteList.txt");
-				Log("Successfully created files");
+                Log("Successfully created files");
 			}
 			Log("All resources exist and validated.");
 		}
@@ -63,7 +63,7 @@ namespace BPDZ
 		{
 			FileData.GoddedPlayers = File.ReadAllLines(GodListFile).ToList();
 			FileData.MutedPlayers = File.ReadAllLines(MuteFilePath).ToList();
-		}
+        }
 
         /// <summary>
         /// Writes an list to a file, every entry on a new line.

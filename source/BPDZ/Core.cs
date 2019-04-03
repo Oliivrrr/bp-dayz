@@ -16,6 +16,7 @@ using System.IO;
 using static BP_API.Core;
 using static BPDZ.Variables;
 using System.Collections;
+using UniversalUnityHooks;
 using Logger = BP_API.Logger;
 
 namespace BPDZ
@@ -57,11 +58,11 @@ namespace BPDZ
         {
             while (true)
             {
-                yield return new WaitForSeconds(60);
+                yield return new WaitForSeconds(15);
                 ShPlayer randomPlayer = svMan.GetRandomRealPlayer();
-                if (randomPlayer != null && randomPlayer.ground)
+                if (randomPlayer.ground)
                 {
-                    LootDrops.Initialize(Players.GetPlayerByID(svMan.GetRandomRealPlayer().ID));
+                    LootDrops.Initialize(randomPlayer);
                 }
             }
         }
@@ -77,7 +78,7 @@ namespace BPDZ
             {
                 if (!player.IsServerSide() && !victim.svEntity.serverside)
                 {
-                    player.SendChatMessage(SvSendType.All, $"<color=red>Player {player.Username} killed {Players.GetPlayerByID(victim.ID).Username} using {player.shPlayer.curEquipable.itemName}</color>");
+                    player.SendChatMessage(SvSendType.All, $"<color=red>{player.Username} killed {Players.GetPlayerByID(victim.ID).Username} using {player.shPlayer.curEquipable.itemName}</color>");
                     Debug.Log($"[BPDZ] {player.Username} killed {Players.GetPlayerByID(victim.ID).Username}");
                 }
                 else if (player.IsServerSide() && !victim.svEntity.serverside)
@@ -138,9 +139,9 @@ namespace BPDZ
 
         public static Vector3 RandomPosition(Vector3 curPosition)
         {
-            int num = ChooseInt(-1,1);
-            Vector3 finalPosition = new Vector3(curPosition.x + 8 * num, curPosition.y, curPosition.z + 8 * num);
-            return finalPosition;
+            int num = GenerateRandom(1, 3);
+            Vector3 f = new Vector3(curPosition.x - (-8 * num), curPosition.y, curPosition.z - (-8 ^ num)); // Still working on better position management
+            return f;
         }
 
         public static IEnumerator KillDelay(ShEntity entity, float time)
@@ -151,19 +152,6 @@ namespace BPDZ
 
         public static int GenerateRandom(int min, int max) => Variables.Random.Next(min, max);
         public static float GenerateRandomF(float min, float max) => UnityEngine.Random.Range(min, max);
-
-        public static int ChooseInt(int option1, int option2)
-        {
-            int num = GenerateRandom(0, 1);
-            if (num == 0)
-            {
-                return option1;
-            }
-            else
-            {
-                return option2;
-            }
-        }
 
         [Command(nameof(SpawnNPC), "Spawn a Zombie.", "Usage: /spawnzombie [TypeID]", new string[] { "spawnzombie", "zombie"}, true, true)]
         public static void SpawnNPC(Player player, int id)
@@ -179,8 +167,7 @@ namespace BPDZ
         [Command(nameof(SpawnLootDrop), "Spawn a Loot Drop.", "Usage: /spawndrop [Tier]", new string[] { "spawndrop", "lootdrop" }, true, true)]
         public static void SpawnLootDrop(Player player, int id)
         {
-            ShEntity Zombie = player.svPlayer.svManager.AddNewEntity(player.shPlayer.manager.skinPrefabs[1], player.shPlayer.GetPlace(), player.shPlayer.GetPosition(), player.shPlayer.GetRotation(), false);
-            LootDrops.Initialize(Players.GetPlayerByID(Zombie.ID));
+            LootDrops.Initialize(player.shPlayer);
             player.SendSuccessMessage($"Successfully Spawned Loot Drop!");
         }
 

@@ -62,7 +62,7 @@ namespace BPDZ
             869043502, //T2 end
             1086364132,
             -872807194, //T3 end
-            - 921321944 //T4 end
+            -921321944 //T4 end
         };
 
         public static int[] Gun = new int[]
@@ -84,9 +84,9 @@ namespace BPDZ
             -1572858027 //T4 end
         };
 
-        public static void Initialize(Player player)
+        public static void Initialize(ShPlayer player)
         {
-            ShEntity spawner = player.svPlayer.svManager.AddNewEntity(player.shPlayer.manager.hands, player.shPlayer.GetPlace(), player.shPlayer.GetPosition(), player.shPlayer.GetRotation(), false);
+            ShEntity spawner = player.svPlayer.svManager.AddNewEntity(player.manager.hands, player.GetPlace(), player.GetPosition(), player.GetRotation(), false);
             int amountofitems = Core.GenerateRandom(1, 4);
             Vector3 spawnerPos = Core.RandomPosition(spawner.GetPosition());
             Vector3 armourPos = new Vector3(spawnerPos.x, spawnerPos.y, spawnerPos.z);
@@ -124,7 +124,7 @@ namespace BPDZ
                 ShEntity armourEntity = spawner.svEntity.svManager.AddNewEntity(armourItem.item, spawner.GetPlace(), armourPos, new Quaternion(-0.7071068f, 0f, 0f, 0.7071068f), false);
                 armourEntity.svEntity.svManager.StartCoroutine(Core.KillDelay(armourEntity, LootDropDespawnTime));
             }
-
+            
             if (amountofitems >= 4)
             {
                 InventoryItem gunItem;
