@@ -5,7 +5,7 @@
  *
  */
 
-using System;
+using System.Collections.Generic;
 
 namespace BPDZ
 {
@@ -17,6 +17,6 @@ namespace BPDZ
             Player = player;
         }
         public bool Alive => !Player.destroyable.IsDead();
-        public ZombieType Type { get; }
+        public ZombieType Type { get; set; }
     }
 }

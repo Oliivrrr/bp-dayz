@@ -32,11 +32,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\BrokeProtocol_Data\Managed\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BrokeProtocol_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="BP-API">
-      <HintPath>..\..\BrokeProtocol_Data\Managed\BP-API.dll</HintPath>
+    <Reference Include="BP-API, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Plugins\BP-API.dll</HintPath>
     </Reference>
     <Reference Include="HookAttribute">
       <HintPath>..\..\BrokeProtocol_Data\Managed\HookAttribute.dll</HintPath>

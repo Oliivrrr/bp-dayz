@@ -1,10 +1,13 @@
-﻿/*
+﻿
+/*
  * BPDayZ
  *   A custom plugin for "Broke Protocol", with zombies.
  * (c) Unlucky 2019
  *
  */
 
+
+using System.CodeDom;
 
 namespace BPDZ
 {
@@ -15,8 +18,31 @@ namespace BPDZ
         {
             Player = player;
         }
-        public string DisplayName { get; set; }
-        public float Rarity { get; set; }
+
+        public string DisplayName
+        {
+            get
+            {
+                return Player.player.username;
+            }
+            set
+            {
+                Player.player.username = value;
+            }
+        }
+
+        public byte Rarity
+        {
+            get
+            {
+                return Player.player.job.jobIndex;
+            }
+            set
+            {
+                Player.player.job.jobIndex = value;
+            }
+        }
+
         public float Health
         {
             get
@@ -29,7 +55,17 @@ namespace BPDZ
             }
         }
         public float DamageMultiplier { get; set; }
-        public float WalkSpeed { get; set; }
-        public float RunSpeed { get; set; }
+
+        public float RunSpeed
+        {
+            get
+            {
+                return Player.player.maxSpeed;
+            }
+            set
+            {
+                Player.player.maxSpeed = value;
+            }
+        }
     }
 }

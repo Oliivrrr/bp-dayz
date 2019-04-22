@@ -18,10 +18,11 @@ using static BPDZ.Variables;
 using System.Collections;
 using UniversalUnityHooks;
 using Logger = BP_API.Logger;
+using Object = UnityEngine.Object;
 
 namespace BPDZ
 {
-    class Core
+    public class Core
     {
         [EntryPoint(resourceName)]
         public static void Main()
@@ -37,6 +38,7 @@ namespace BPDZ
             BP_API.Core.Resources[resourceName].ResourceInfo.Author = "Unlucky";
             BP_API.Core.Resources[resourceName].ResourceInfo.Description = "A DayZ plugin created by Unlucky";
         }
+
         static void RegisterEvents()
         {
             PlayerEvents.OnPlayerConnected += OnPlayerConnected;
@@ -44,32 +46,90 @@ namespace BPDZ
             PlayerEvents.OnPlayerDamage += OnPlayerDamage;
             PlayerEvents.OnGlobalChatMessage += SvGlobalChatMessage;
             PlayerEvents.OnPlayerCrime += OnPlayerCrime;
-            PlayerEvents.OnNpcSpawned += OnNpcSpawned;
+            PlayerEvents.OnNpcSpawned += Zombies.SpawnZombie;
             ServerEvents.OnStartServer += OnStartServer;
+            //PlayerEvents.OnPlayerVehicleEnter += OnPlayerVehicleEnter;
+        }
+
+        private static IEnumerator ContaminationLoop(Player player)
+        {
+            while (true)
+            {
+                yield return new WaitForSeconds(1f);
+                if (player.shPlayer.GetPosition().x < -252)
+                {
+                    player.SendSuccessMessage("You have entered a Contaminated Area! You will take damage if you are not wearing a gas mask!");
+                    yield return new WaitForSeconds(4f);
+                    if (player.shPlayer.GetWearable(WearableType.Head).ID == -1627168389)
+                    {
+                        player.svPlayer.Damage(DamageIndex.Null, 5f, player.shPlayer, player.shPlayer.headCollider);
+                    }
+                }
+            }
+            
+        }
+
+        private static bool OnPlayerVehicleEnter(Player player, ref int seat)
+        {
+            player.svPlayer.svManager.StartCoroutine(CarLoop(player));
+            return false;
+        }
+
+        private static IEnumerator CarLoop(Player player)
+        {
+            float time = 60f;
+            yield return new WaitForSeconds(1f);
+            while (player.shPlayer.curMount)
+            {
+                if (!player.Inventory.HasItem(1699387113))
+                {
+                    player.SendSuccessMessage("You ran out of fuel!");
+                }
+                yield return new WaitForSeconds(time);
+                player.Inventory.RemoveItem(1699387113, 1);
+            }
         }
 
         static void OnStartServer(SvManager svMan)
         {
             svMan.startMoney = 0;
-            svMan.StartCoroutine(DayZLoop(SvMan));
+            svMan.StartCoroutine(SpawnLootLoop(SvMan));
         }
 
-        private static IEnumerator DayZLoop(SvManager svMan)
+        private static IEnumerator SpawnLootLoop(SvManager svMan)
         {
             while (true)
             {
-                yield return new WaitForSeconds(15);
+                yield return new WaitForSeconds(60);
                 ShPlayer randomPlayer = svMan.GetRandomRealPlayer();
-                if (randomPlayer.ground)
+                if (randomPlayer != null && randomPlayer.ground && randomPlayer.curMount == null && randomPlayer.GetPlaceIndex() == 0)
                 {
                     LootDrops.Initialize(randomPlayer);
                 }
             }
         }
 
-        static bool OnNpcSpawned(Player player, ref Vector3 position, ref Quaternion rotation, ref Place place, ref Waypoint node, ref ShPlayer spawner, ref ShEntity mount, ref ShPlayer enemy)
+        static public IEnumerator LookForPlayers(SvPlayer player)
         {
-            return true;
+            while (!player.player.IsDead())
+            {
+                yield return new WaitForSeconds(5f);
+                foreach (Sector sector in player.localSectors)
+                {
+                    foreach (ShEntity shEntity in sector.centered)
+                    {
+                        if (!(shEntity == player.entity))
+                        {
+                            ShPlayer shPlayer = shEntity as ShPlayer;
+                            if (shPlayer && player.player.CanSeeEntity(shPlayer) && shPlayer.job.jobIndex != player.player.job.jobIndex)
+                            {
+                                player.targetEntity = shPlayer;
+                                player.SetState(10);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         static bool OnPlayerCrime(Player player, ref byte crimeIndex, ref ShEntity victim)
@@ -86,17 +146,6 @@ namespace BPDZ
                     player.SendChatMessage(SvSendType.All, $"<color=red>{Players.GetPlayerByID(victim.ID).Username} was killed by a zombie</color>");
                 }
             }
-
-            /* Need to find a way to locate restricted area colliders - Unlucky
-            if (crimeIndex == CrimeIndex.Trespassing && player.shPlayer.curWearables[0].ID != -1627168389)
-            {
-                while (player.shPlayer.headCollider.bounds.Intersects( blah blah find a way))
-                {
-                    player.svPlayer.Damage(DamageIndex.Null, 5, player.shPlayer, player.shPlayer.headCollider);
-                    Debug.Log("Damaged");
-                }
-            }*/
-
             return true;
         }
 
@@ -109,6 +158,17 @@ namespace BPDZ
                 player.SendChatMessage($"<color=#fff>Blocked {amount}HP of damage</color>");
                 return true;
             }
+
+            if (type == DamageIndex.Melee)
+            {
+                foreach (var zombie in Zombies.GetAliveZombies())
+                {
+                    if (attacker.Username == zombie.Player.player.username && zombie.Type != null)
+                    {
+                        amount = amount * zombie.Type.DamageMultiplier;
+                    }
+                }
+            }
             return false;
         }
 
@@ -118,8 +178,10 @@ namespace BPDZ
             Loggers.Chat.Log($"[{player.ID}]  {player.FilteredUsername}: {message.FilterString()}");
             return true;
         }
+
         static void OnPlayerConnected(Player player)
         {
+            player.svPlayer.svManager.StartCoroutine(ContaminationLoop(player));
             if (player.svPlayer.playerData.username != null)
             {
                 Loggers.Chat.Log($"[{player.ID}] {player.Username} Joined the server ({player.UserData.GetIpV4()})");
@@ -156,12 +218,24 @@ namespace BPDZ
         [Command(nameof(SpawnNPC), "Spawn a Zombie.", "Usage: /spawnzombie [TypeID]", new string[] { "spawnzombie", "zombie"}, true, true)]
         public static void SpawnNPC(Player player, int id)
         {
-            ShEntity Zombie = player.svPlayer.svManager.AddNewEntity(player.shPlayer.manager.skinPrefabs[id], player.shPlayer.GetPlace(), player.shPlayer.GetPosition(), player.shPlayer.GetRotation(), false);
-            foreach (var item in Zombie.myItems.Values)
+            ShEntity zombie = player.svPlayer.svManager.AddNewEntity(player.shPlayer.manager.skinPrefabs[id], player.shPlayer.GetPlace(), player.shPlayer.GetPosition(), player.shPlayer.GetRotation(), false);
+            foreach (var item in zombie.myItems.Values)
             {
-                Zombie.RemoveFromMyItems(item.item.ID, item.count);
+                zombie.RemoveFromMyItems(item.item.ID, item.count);
             }
             player.SendSuccessMessage($"Successfully Spawned Zombie!");
+        }
+
+        [Command(nameof(ClearItems), "Clears the inventory of target player.", "Usage: /clear [username]", new string[] { "spawnzombie", "zombie" }, true, true)]
+        public static void ClearItems(Player player, string target)
+        {
+            Player targetPlayer = Players.GetPlayerByUsername(target);
+            foreach (var item in targetPlayer.shPlayer.myItems)
+            {
+                player.Inventory.RemoveItem(item.Value.item.ID, item.Value.count);
+            }
+            player.SendSuccessMessage($"Successfully Cleared Player {targetPlayer.Username} Inventory");
+            targetPlayer.SendSuccessMessage($"Your Inventory Was Cleared by {player.Username}");
         }
 
         [Command(nameof(SpawnLootDrop), "Spawn a Loot Drop.", "Usage: /spawndrop [Tier]", new string[] { "spawndrop", "lootdrop" }, true, true)]

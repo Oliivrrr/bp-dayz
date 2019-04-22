@@ -62,7 +62,8 @@ namespace BPDZ
             869043502, //T2 end
             1086364132,
             -872807194, //T3 end
-            -921321944 //T4 end
+            -921321944, //T4 end
+            1699387113
         };
 
         public static int[] Gun = new int[]
@@ -87,7 +88,7 @@ namespace BPDZ
         public static void Initialize(ShPlayer player)
         {
             ShEntity spawner = player.svPlayer.svManager.AddNewEntity(player.manager.hands, player.GetPlace(), player.GetPosition(), player.GetRotation(), false);
-            int amountofitems = Core.GenerateRandom(1, 4);
+            int amountofitems = Core.GenerateRandom(4, 4);
             Vector3 spawnerPos = Core.RandomPosition(spawner.GetPosition());
             Vector3 armourPos = new Vector3(spawnerPos.x, spawnerPos.y, spawnerPos.z);
             Vector3 ammoPos = new Vector3(spawnerPos.x + 2f, spawnerPos.y, spawnerPos.z - 2f);
@@ -125,7 +126,7 @@ namespace BPDZ
                 armourEntity.svEntity.svManager.StartCoroutine(Core.KillDelay(armourEntity, LootDropDespawnTime));
             }
             
-            if (amountofitems >= 4)
+            if (amountofitems == 4)
             {
                 InventoryItem gunItem;
                 int itemID = Gun[Core.GenerateRandom(0, 14)];
