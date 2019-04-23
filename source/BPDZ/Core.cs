@@ -147,6 +147,7 @@ namespace BPDZ
                 {
                     player.SendChatMessage(SvSendType.All, $"<color=red>{player.Username} killed {Players.GetPlayerByID(victim.ID).Username} using {player.shPlayer.curEquipable.itemName}</color>");
                     Debug.Log($"[BPDZ] {player.Username} killed {Players.GetPlayerByID(victim.ID).Username}");
+                    return false;
                 }
                 else if (player.IsServerSide() && !victim.svEntity.serverside)
                 {
@@ -240,12 +241,15 @@ namespace BPDZ
         [Command(nameof(SpawnNPC), "Spawn a Zombie.", "Usage: /spawnzombie [TypeID]", new string[] { "spawnzombie", "zombie"}, true, true)]
         public static void SpawnNPC(Player player, int id)
         {
-            ShEntity zombie = player.svPlayer.svManager.AddNewEntity(player.shPlayer.manager.skinPrefabs[id], player.shPlayer.GetPlace(), player.shPlayer.GetPosition(), player.shPlayer.GetRotation(), false);
-            foreach (var item in zombie.myItems.Values)
-            {
-                zombie.RemoveFromMyItems(item.item.ID, item.count);
-            }
+            player.svPlayer.SpawnBot(player.shPlayer.GetPosition(), player.shPlayer.GetRotation(), player.shPlayer.GetPlace(), null, player.shPlayer.manager.skinPrefabs[id], null, player.shPlayer);
             player.SendSuccessMessage($"Successfully Spawned Zombie!");
+        }
+
+        [Command(nameof(Help), "Opens help menu.", "Usage: /help", new string[] { "help", "h" })]
+        public static void Help(Player player)
+        {
+            player.SendServerInfoMessage(SvSendType.Self, File.ReadAllText("server_info.txt"));
+            player.SendSuccessMessage($"Opened help menu");
         }
 
         [Command(nameof(ClearItems), "Clears the inventory of target player.", "Usage: /clear [username]", new string[] { "spawnzombie", "zombie" }, true, true)]
@@ -260,8 +264,8 @@ namespace BPDZ
             targetPlayer.SendSuccessMessage($"Your Inventory Was Cleared by {player.Username}");
         }
 
-        [Command(nameof(SpawnLootDrop), "Spawn a Loot Drop.", "Usage: /spawndrop [Tier]", new string[] { "spawndrop", "lootdrop" }, true, true)]
-        public static void SpawnLootDrop(Player player, int id)
+        [Command(nameof(SpawnLootDrop), "Spawn a Loot Drop.", "Usage: /spawndrop", new string[] { "spawndrop", "lootdrop" }, true, true)]
+        public static void SpawnLootDrop(Player player)
         {
             LootDrops.Initialize(player.shPlayer);
             player.SendSuccessMessage($"Successfully Spawned Loot Drop!");
@@ -288,6 +292,13 @@ namespace BPDZ
         {
             player.Location.SetPosition(target.Location.GetPosition());
             player.SendSuccessMessage($"Successfully teleported to {target.FilteredUsername}");
+        }
+
+        [Command(nameof(Give), "Gives the player an item.", "Usage: /give [itemID]", new string[] { "give" }, true, true)]
+        public static void Give(Player player, int itemID, int amount)
+        {
+            player.Inventory.AddItem(itemID, amount);
+            player.SendSuccessMessage($"Successfully gave you {amount} {player.Inventory.GetItem(itemID).item.itemName}(s)");
         }
 
         [Command(nameof(TeleportToSender), "Teleports a player to you.", "Usage: /tphere [username]", new string[] { "tph", "tphere" }, true, true)]
