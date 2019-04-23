@@ -50,7 +50,6 @@ namespace BPDZ
 				Log("Creating files...");
 				File.Create("BPDayZ/GodList.txt");
 				File.Create("BPDayZ/DiscordLink.txt");
-				File.Create("BPDayZ/HelpMessage.txt");
 				File.Create("BPDayZ/MuteList.txt");
                 Log("Successfully created files");
 			}
