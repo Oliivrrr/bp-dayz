@@ -55,6 +55,8 @@ namespace BPDZ
             player.shPlayer.job.jobIndex = JobIndex.Criminal;
             player.svPlayer.svManager.StartCoroutine(ZombieLoop(player));
             player.svPlayer.svManager.StartCoroutine(Core.LookForPlayers(player.svPlayer));
+            player.svPlayer.SvAddCrime(CrimeIndex.Trespassing, player.shPlayer);
+            player.svPlayer.SvAddCrime(CrimeIndex.Trespassing, player.shPlayer);
             return true;
         }
 
