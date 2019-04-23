@@ -15,10 +15,11 @@ namespace BPDZ
         {
             Player = player;
             DisplayName = "Slug";
-            Rarity = 2; //9
+            Rarity = 10;
             Health = 200;
             DamageMultiplier = 2.5f;
             RunSpeed = 6f;
+            Dif = 1076848752;
         }
     }
 }

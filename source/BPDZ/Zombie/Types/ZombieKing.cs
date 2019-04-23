@@ -15,10 +15,11 @@ namespace BPDZ
         {
             Player = player;
             DisplayName = "Zombie King";
-            Rarity = 3; //1
+            Rarity = 1;
             Health = 500;
             DamageMultiplier = 10f;
             RunSpeed = 4f;
+            Dif = 112674745;
         }
     }
 }

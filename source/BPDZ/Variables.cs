@@ -22,7 +22,7 @@ namespace BPDZ
 		public const string prefix = "BPDayZ";
 
 		public static string RootFolder { get; } = "BPDayZ";
-		public static string GroupsFolder { get; } = Path.Combine(RootFolder, "groups/");
+		public static string GroupsFolder { get; } = Path.Combine(RootFolder, "Groups/");
 		public static string GodListFile { get; } = Path.Combine(RootFolder, "GodList.txt");
 		public static string MuteFilePath { get; } = Path.Combine(RootFolder, "MuteList.txt");
 		public static Random Random { get; } = new Random();

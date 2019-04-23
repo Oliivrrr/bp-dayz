@@ -15,10 +15,11 @@ namespace BPDZ
         {
             Player = player;
             DisplayName = "Runner";
-            Rarity = 1; //25
+            Rarity = 24;
             Health = 135;
             DamageMultiplier = 1f;
-            RunSpeed = 9.1f;
+            RunSpeed = 9.2f;
+            Dif = -471928380;
         }
     }
 }

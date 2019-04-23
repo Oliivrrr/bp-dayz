@@ -31,29 +31,10 @@ namespace BPDZ
             }
         }
 
-        public byte Rarity
-        {
-            get
-            {
-                return Player.player.job.jobIndex;
-            }
-            set
-            {
-                Player.player.job.jobIndex = value;
-            }
-        }
+        public int Rarity { get; set; }
 
-        public float Health
-        {
-            get
-            {
-                return Player.player.health;
-            }
-            set
-            {
-                Player.player.health = value;
-            }
-        }
+        public int Health { get; set; }
+
         public float DamageMultiplier { get; set; }
 
         public float RunSpeed
@@ -67,5 +48,7 @@ namespace BPDZ
                 Player.player.maxSpeed = value;
             }
         }
+
+        public int Dif { get; set; }
     }
 }

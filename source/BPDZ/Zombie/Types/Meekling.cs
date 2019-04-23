@@ -15,10 +15,11 @@ namespace BPDZ
         {
             Player = player;
             DisplayName = "Meekling";
-            Rarity = 0; //65
+            Rarity = 65;
             Health = 120;
             DamageMultiplier = 1.5f;
             RunSpeed = 8.5f;
+            Dif = 673780802;
         }
     }
 }

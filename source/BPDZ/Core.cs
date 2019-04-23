@@ -53,20 +53,25 @@ namespace BPDZ
 
         private static IEnumerator ContaminationLoop(Player player)
         {
-            while (true)
+            player.SendSuccessMessage("You have entered a Contaminated Area! You will take damage if you are not wearing a gas mask!");
+            while (player.shPlayer.GetPosition().x < -252)
             {
-                yield return new WaitForSeconds(1f);
-                if (player.shPlayer.GetPosition().x < -252)
+                Debug.Log("1");
+                yield return new WaitForSeconds(4f);
+                if (player.shPlayer.GetWearable(WearableType.Head) != null)
                 {
-                    player.SendSuccessMessage("You have entered a Contaminated Area! You will take damage if you are not wearing a gas mask!");
-                    yield return new WaitForSeconds(4f);
-                    if (player.shPlayer.GetWearable(WearableType.Head).ID == -1627168389)
+                    Debug.Log("2");
+                    if (player.shPlayer.GetWearable(WearableType.Head).index != -1627168389)
                     {
-                        player.svPlayer.Damage(DamageIndex.Null, 5f, player.shPlayer, player.shPlayer.headCollider);
+                        player.shPlayer.health -= 5f;
                     }
                 }
+                else if(player.shPlayer.GetWearable(WearableType.Head) == null)
+                {
+                    player.shPlayer.health = player.shPlayer.health - 5f;
+                }
             }
-            
+            player.SendSuccessMessage("You left the Contaminated Area");
         }
 
         private static bool OnPlayerVehicleEnter(Player player, ref int seat)
@@ -100,9 +105,11 @@ namespace BPDZ
         {
             while (true)
             {
-                yield return new WaitForSeconds(60);
+                float s = 1f;
+                s *= PlayerList.Count;
+                yield return new WaitForSeconds(60/s);
                 ShPlayer randomPlayer = svMan.GetRandomRealPlayer();
-                if (randomPlayer != null && randomPlayer.ground && randomPlayer.curMount == null && randomPlayer.GetPlaceIndex() == 0)
+                if (randomPlayer != null && randomPlayer.curMount == null)
                 {
                     LootDrops.Initialize(randomPlayer);
                 }
@@ -146,28 +153,40 @@ namespace BPDZ
                     player.SendChatMessage(SvSendType.All, $"<color=red>{Players.GetPlayerByID(victim.ID).Username} was killed by a zombie</color>");
                 }
             }
+
+            if (crimeIndex == CrimeIndex.Trespassing)
+            {
+                if (player.svPlayer.serverside)
+                {
+                    return false;
+                }
+                player.svPlayer.svManager.StartCoroutine(ContaminationLoop(player));
+            }
             return true;
         }
 
         static bool OnPlayerDamage(Player player, Player attacker, ref DamageIndex type, ref float amount, ref Collider collider)
         {
+            if (attacker != null && type == DamageIndex.Melee)
+            {
+                if (attacker.svPlayer.serverside)
+                {
+                    foreach (var zombie in Zombies.GetAliveZombies())
+                    {
+                        if (attacker.shPlayer.username == zombie.Player.player.username)
+                        {
+                            player.svPlayer.Damage(DamageIndex.Null, amount * zombie.Type.DamageMultiplier, player.shPlayer, collider);
+                            return true;
+                        }
+                    }
+                }
+            }
             foreach (var name in FileData.GoddedPlayers)
             {
                 if (name != player.Username)
                     continue;
                 player.SendChatMessage($"<color=#fff>Blocked {amount}HP of damage</color>");
                 return true;
-            }
-
-            if (type == DamageIndex.Melee)
-            {
-                foreach (var zombie in Zombies.GetAliveZombies())
-                {
-                    if (attacker.Username == zombie.Player.player.username && zombie.Type != null)
-                    {
-                        amount = amount * zombie.Type.DamageMultiplier;
-                    }
-                }
             }
             return false;
         }
@@ -209,7 +228,10 @@ namespace BPDZ
         public static IEnumerator KillDelay(ShEntity entity, float time)
         {
             yield return new WaitForSeconds(time);
-            entity.Destroy();
+            if (entity != null)
+            {
+                entity.Destroy();
+            }
         }
 
         public static int GenerateRandom(int min, int max) => Variables.Random.Next(min, max);

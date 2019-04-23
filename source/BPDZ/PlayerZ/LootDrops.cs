@@ -89,10 +89,10 @@ namespace BPDZ
         {
             ShEntity spawner = player.svPlayer.svManager.AddNewEntity(player.manager.hands, player.GetPlace(), player.GetPosition(), player.GetRotation(), false);
             int amountofitems = Core.GenerateRandom(4, 4);
-            Vector3 spawnerPos = Core.RandomPosition(spawner.GetPosition());
-            Vector3 armourPos = new Vector3(spawnerPos.x, spawnerPos.y, spawnerPos.z);
-            Vector3 ammoPos = new Vector3(spawnerPos.x + 2f, spawnerPos.y, spawnerPos.z - 2f);
-            Vector3 gunPos = new Vector3(spawnerPos.x - 2, spawnerPos.y, spawnerPos.z);
+            Vector3 spawnerPos = new Vector3(Core.RandomPosition(spawner.GetPosition()).x, 0f, Core.RandomPosition(spawner.GetPosition()).z);Core.RandomPosition(spawner.GetPosition());
+            Vector3 armourPos = new Vector3(spawnerPos.x, 0f, spawnerPos.z);
+            Vector3 ammoPos = new Vector3(spawnerPos.x + 2f, 0f, spawnerPos.z - 2f);
+            Vector3 gunPos = new Vector3(spawnerPos.x - 2, 0f, spawnerPos.z);
             
             if (amountofitems >= 1)
             {

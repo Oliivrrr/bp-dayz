@@ -22,17 +22,20 @@ namespace BPDZ
         public static IEnumerable<Zombie> GetZombies() => List;
         public static IEnumerable<Zombie> GetAliveZombies() => List.Where(x=>x.Alive);
 
-        public static bool SpawnZombie(Player player, ref Vector3 position, ref Quaternion rotation, ref Place place, ref Waypoint node, ref ShPlayer spawner, ref ShMountable mount, ref ShPlayer enemy)
+        public static bool SpawnZombie(Player player, ref Vector3 position, ref Quaternion rotation, ref Place place,
+            ref Waypoint node, ref ShPlayer spawner, ref ShMountable mount, ref ShPlayer enemy)
         {
             var zombie = new Zombie(player.svPlayer);
-            int f = Core.GenerateRandom(1, 100);
-            if (f == 100)
+            int TypeChance = Core.GenerateRandom(1, 100);
+            if (TypeChance == new ZombieKing(player.svPlayer).Rarity)
+            {
                 zombie.Type = new ZombieKing(player.svPlayer);
-            else if (f >= 75)
+            }
+            else if (TypeChance <= new Runner(player.svPlayer).Rarity)
             {
                 zombie.Type = new Runner(player.svPlayer);
             }
-            else if (f > 81)
+            else if (TypeChance <= new Slug(player.svPlayer).Rarity)
             {
                 zombie.Type = new Slug(player.svPlayer);
             }
@@ -40,6 +43,7 @@ namespace BPDZ
             {
                 zombie.Type = new Meekling(player.svPlayer);
             }
+
             player.svPlayer.preFrame = true;
             if (node)
             {
@@ -50,30 +54,30 @@ namespace BPDZ
             {
                 player.svPlayer.onWaypoints = false;
             }
+            player.svPlayer.SvTrySetJob(JobIndex.Criminal, false, false);
             player.svPlayer.player.Spawn(position, rotation, place.transform);
+            player.Stats.SetHealth(zombie.Type.Health, true);
             List.Add(zombie);
-            player.shPlayer.job.jobIndex = JobIndex.Criminal;
-            player.svPlayer.svManager.StartCoroutine(ZombieLoop(player));
+            player.svPlayer.svManager.StartCoroutine(ZombieLoop(player, zombie.Type));
             player.svPlayer.svManager.StartCoroutine(Core.LookForPlayers(player.svPlayer));
-            player.svPlayer.SvAddCrime(CrimeIndex.Trespassing, player.shPlayer);
-            player.svPlayer.SvAddCrime(CrimeIndex.Trespassing, player.shPlayer);
+            player.shPlayer.SetWearable(zombie.Type.Dif);
             return true;
         }
 
-        static IEnumerator ZombieLoop(Player player)
+        static IEnumerator ZombieLoop(Player player, ZombieType zombieType)
         {
             while (!player.shPlayer.IsDead())
             {
-                player.svPlayer.SvSetWearable(673780802);
-                player.svPlayer.SvSetWearable(-1638932793);
-                player.svPlayer.SvSetWearable(1089711634);
-                player.svPlayer.SvSetWearable(2064679354);
-                player.svPlayer.SvSetWearable(-501996567);
-                player.svPlayer.SvSetWearable(-1191209217);
-                foreach (var item in player.shPlayer.myItems)
+                foreach (InventoryItem inventoryItem in player.shPlayer.myItems.Values.ToArray())
                 {
-                    player.Inventory.RemoveItem(item.Value.item.ID, item.Value.count);
+                    if (inventoryItem.item.index != zombieType.Dif)
+                    {
+                        player.shPlayer.TransferItem(2, inventoryItem.item.index, inventoryItem.count, true);
+                    }
                 }
+                player.shPlayer.SetWearable(zombieType.Dif);
+                player.svPlayer.SvTrySetJob(JobIndex.Criminal, false, false);
+                player.svPlayer.SvAddCrime(CrimeIndex.Trespassing, player.shPlayer);
                 yield return new WaitForSeconds(1f);
             }
         }
