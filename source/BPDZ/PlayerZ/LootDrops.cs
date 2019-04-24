@@ -16,6 +16,7 @@ namespace BPDZ
     class LootDrops
     {
         public static float LootDropDespawnTime = 90f;
+
         public static int[] Armour = new int[]
         {
             -1627168389, //T1 start
@@ -88,19 +89,26 @@ namespace BPDZ
 
         public static void Initialize(ShPlayer player)
         {
-            ShEntity spawner = player.svPlayer.svManager.AddNewEntity(player.manager.hands, player.GetPlace(), player.GetPosition(), player.GetRotation(), false);
-            int amountofitems = Core.GenerateRandom(4, 4);
-            Vector3 spawnerPos = new Vector3(Core.RandomPosition(spawner.GetPosition()).x, 0f, Core.RandomPosition(spawner.GetPosition()).z);Core.RandomPosition(spawner.GetPosition());
+            int foodItemID;
+            int ammoItemID;
+            int armourItemID;
+            int gunItemID;
+            ShEntity spawner = player.svPlayer.svManager.AddNewEntity(player.manager.hands, player.GetPlace(),
+            player.GetPosition(), player.GetRotation(), false);
+            int amountofitems = Core.GenerateRandom(1, 4);
+            Vector3 spawnerPos = new Vector3(Core.RandomPosition(spawner.GetPosition()).x, 0f,
+            Core.RandomPosition(spawner.GetPosition()).z);
+            Core.RandomPosition(spawner.GetPosition());
             Vector3 armourPos = new Vector3(spawnerPos.x, 0f, spawnerPos.z);
             Vector3 ammoPos = new Vector3(spawnerPos.x + 2f, 0f, spawnerPos.z - 2f);
             Vector3 gunPos = new Vector3(spawnerPos.x - 2, 0f, spawnerPos.z);
-            
+
             if (amountofitems >= 1)
             {
                 InventoryItem foodItem;
-                int itemID = Food[Core.GenerateRandom(0, 10)];
-                spawner.AddToMyItems(itemID, 1);
-                spawner.myItems.TryGetValue(itemID, out foodItem);
+                foodItemID = Food[Core.GenerateRandom(0, 10)];
+                spawner.AddToMyItems(foodItemID, 1);
+                spawner.myItems.TryGetValue(foodItemID, out foodItem);
                 ShEntity FoodEntity = spawner.svEntity.svManager.AddNewEntity(foodItem.item, spawner.GetPlace(), spawnerPos, spawner.GetRotation(), false);
                 FoodEntity.svEntity.svManager.StartCoroutine(Core.KillDelay(FoodEntity, LootDropDespawnTime));
             }
@@ -108,11 +116,11 @@ namespace BPDZ
             if (amountofitems >= 2)
             {
                 InventoryItem caseItem;
-                int itemID = Ammo[Core.GenerateRandom(0, 6)];
+                ammoItemID = Ammo[Core.GenerateRandom(0, 6)];
                 spawner.AddToMyItems(-667273670, 1);
                 spawner.myItems.TryGetValue(-667273670, out caseItem);
                 ShEntity ammoCase = spawner.svEntity.svManager.AddNewEntity(caseItem.item, spawner.GetPlace(), ammoPos, new Quaternion(0f, 0f, 0f, 0), false);
-                ammoCase.AddToMyItems(itemID, Core.GenerateRandom(20, 35));
+                ammoCase.AddToMyItems(ammoItemID, Core.GenerateRandom(20, 35));
                 ammoCase.svEntity.destroyEmpty = true;
                 ammoCase.svEntity.svManager.StartCoroutine(Core.KillDelay(ammoCase, LootDropDespawnTime));
             }
@@ -120,19 +128,19 @@ namespace BPDZ
             if (amountofitems >= 3)
             {
                 InventoryItem armourItem;
-                int itemID = Armour[Core.GenerateRandom(0, 19)];
-                spawner.AddToMyItems(itemID, 1);
-                spawner.myItems.TryGetValue(itemID, out armourItem);
+                armourItemID = Armour[Core.GenerateRandom(0, 19)];
+                spawner.AddToMyItems(armourItemID, 1);
+                spawner.myItems.TryGetValue(armourItemID, out armourItem);
                 ShEntity armourEntity = spawner.svEntity.svManager.AddNewEntity(armourItem.item, spawner.GetPlace(), armourPos, new Quaternion(-0.7071068f, 0f, 0f, 0.7071068f), false);
                 armourEntity.svEntity.svManager.StartCoroutine(Core.KillDelay(armourEntity, LootDropDespawnTime));
             }
-            
+
             if (amountofitems == 4)
             {
                 InventoryItem gunItem;
-                int itemID = Gun[Core.GenerateRandom(0, 14)];
-                spawner.AddToMyItems(itemID, 1);
-                spawner.myItems.TryGetValue(itemID, out gunItem);
+                gunItemID = Gun[Core.GenerateRandom(0, 14)];
+                spawner.AddToMyItems(gunItemID, 1);
+                spawner.myItems.TryGetValue(gunItemID, out gunItem);
                 ShEntity gunEntity = spawner.svEntity.svManager.AddNewEntity(gunItem.item, spawner.GetPlace(), gunPos, new Quaternion(0f, 0f, 0.7071068f, 0.7071068f), false);
                 gunEntity.svEntity.svManager.StartCoroutine(Core.KillDelay(gunEntity, LootDropDespawnTime));
             }
