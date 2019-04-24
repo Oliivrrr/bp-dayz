@@ -31,13 +31,13 @@ namespace BPDZ
             {
                 zombie.Type = new ZombieKing(player.svPlayer);
             }
-            else if (TypeChance <= new Runner(player.svPlayer).Rarity)
-            {
-                zombie.Type = new Runner(player.svPlayer);
-            }
             else if (TypeChance <= new Slug(player.svPlayer).Rarity)
             {
                 zombie.Type = new Slug(player.svPlayer);
+            }
+            else if (TypeChance <= new Runner(player.svPlayer).Rarity)
+            {
+                zombie.Type = new Runner(player.svPlayer);
             }
             else
             {
