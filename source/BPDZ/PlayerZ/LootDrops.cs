@@ -15,7 +15,7 @@ namespace BPDZ
 {
     class LootDrops
     {
-        public static float LootDropDespawnTime = 120f;
+        public static float LootDropDespawnTime = 90f;
         public static int[] Armour = new int[]
         {
             -1627168389, //T1 start
