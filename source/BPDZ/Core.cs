@@ -108,8 +108,11 @@ namespace BPDZ
                 ShPlayer randomPlayer = svMan.GetRandomRealPlayer();
                 if (randomPlayer != null)
                 {
-                    LootDrops.Initialize(randomPlayer);
-                    yield return new WaitForSeconds(45f / randomPlayer.svPlayer.svManager.players.Count);
+                    if (!randomPlayer.isUnderwater)
+                    {
+                        LootDrops.Initialize(randomPlayer);
+                        yield return new WaitForSeconds(45f / randomPlayer.svPlayer.svManager.players.Count);
+                    }
                 }
                 yield return new WaitForSeconds(1f);
             }
@@ -306,7 +309,7 @@ namespace BPDZ
         [Command(nameof(TeleportToTarget), "Teleports you to another player.", "Usage: /tp [username]", new string[] { "tp", "teleport" }, true, true)]
         public static void TeleportToTarget(Player player, Player target)
         {
-            player.Location.SetPosition(target.Location.GetPosition());
+            player.shPlayer.Reset(target.Location.GetPosition(), target.Location.GetRotation(), target.Location.GetPositionT());
             player.SendSuccessMessage($"Successfully teleported to {target.FilteredUsername}");
         }
 
@@ -320,7 +323,7 @@ namespace BPDZ
         [Command(nameof(TeleportToSender), "Teleports a player to you.", "Usage: /tphere [username]", new string[] { "tph", "tphere" }, true, true)]
         public static void TeleportToSender(Player player, Player target)
         {
-            target.Location.SetPosition(player.Location.GetPosition());
+            target.shPlayer.Reset(player.Location.GetPosition(), player.Location.GetRotation(), player.Location.GetPositionT());
             player.SendSuccessMessage($"Successfully teleported {target.FilteredUsername} to yourself.");
         }
         [Command("Kick", "Disconnects a player from the server for 10mins", "Usage: /kick [playerID] [reason]", new string[] { "kick" }, true, true)]
