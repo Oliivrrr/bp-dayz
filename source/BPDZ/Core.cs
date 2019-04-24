@@ -56,19 +56,17 @@ namespace BPDZ
             player.SendSuccessMessage("You have entered a Contaminated Area! You will take damage if you are not wearing a gas mask!");
             while (player.shPlayer.GetPosition().x < -252)
             {
-                Debug.Log("1");
                 yield return new WaitForSeconds(4f);
                 if (player.shPlayer.GetWearable(WearableType.Head) != null)
                 {
-                    Debug.Log("2");
                     if (player.shPlayer.GetWearable(WearableType.Head).index != -1627168389)
                     {
-                        player.shPlayer.health -= 5f;
+                        player.svPlayer.Damage(DamageIndex.Null, 5f, player.shPlayer, player.shPlayer.headCollider);
                     }
                 }
                 else if(player.shPlayer.GetWearable(WearableType.Head) == null)
                 {
-                    player.shPlayer.health = player.shPlayer.health - 5f;
+                    player.svPlayer.Damage(DamageIndex.Null, 5f, player.shPlayer, player.shPlayer.headCollider);
                 }
             }
             player.SendSuccessMessage("You left the Contaminated Area");
@@ -98,21 +96,20 @@ namespace BPDZ
         static void OnStartServer(SvManager svMan)
         {
             svMan.startMoney = 0;
-            svMan.StartCoroutine(SpawnLootLoop(SvMan));
+            svMan.StartCoroutine(SpawnLootLoop(svMan));
         }
 
         private static IEnumerator SpawnLootLoop(SvManager svMan)
         {
             while (true)
             {
-                float s = 1f;
-                s *= PlayerList.Count;
-                yield return new WaitForSeconds(60/s);
                 ShPlayer randomPlayer = svMan.GetRandomRealPlayer();
-                if (randomPlayer != null && randomPlayer.curMount == null)
+                if (randomPlayer != null)
                 {
                     LootDrops.Initialize(randomPlayer);
+                    yield return new WaitForSeconds(45f / randomPlayer.svPlayer.svManager.players.Count);
                 }
+                yield return new WaitForSeconds(1f);
             }
         }
 
@@ -201,7 +198,6 @@ namespace BPDZ
 
         static void OnPlayerConnected(Player player)
         {
-            player.svPlayer.svManager.StartCoroutine(ContaminationLoop(player));
             if (player.svPlayer.playerData.username != null)
             {
                 Loggers.Chat.Log($"[{player.ID}] {player.Username} Joined the server ({player.UserData.GetIpV4()})");
