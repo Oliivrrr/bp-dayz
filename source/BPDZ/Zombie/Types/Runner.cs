@@ -18,7 +18,7 @@ namespace BPDZ
             Rarity = 24;
             Health = 135;
             DamageMultiplier = 1f;
-            RunSpeed = 9.2f;
+            RunSpeed = 10f;
             Wearables = new[]
             {
                 -1962854266, //Head

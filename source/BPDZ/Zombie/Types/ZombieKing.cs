@@ -21,12 +21,12 @@ namespace BPDZ
             RunSpeed = 4f;
             Wearables = new[]
             {
-                -1627168389, //Head
+                880705339, //Head
                 1089711634, //Face
-                22766327, //Body
+                2065462452, //Body
                 112674745, //Armour
                 1174688158, //Hands
-                651387638, //Legs
+                -1527091616, //Legs
                 837068077, //Feet
                 673780802 //Back
             };
