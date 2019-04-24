@@ -249,10 +249,10 @@ namespace BPDZ
             player.SendSuccessMessage($"Opened help menu");
         }
 
-        [Command(nameof(Feed), "Refills all stat bars.", "Usage: /feed", new string[] { "feed", "f" })]
-        public static void Feed(Player player)
+        [Command(nameof(Feed), "Refills all stat bars.", "Usage: /feed [username]", new string[] { "feed", "f" })]
+        public static void Feed(Player player, Player target)
         {
-            player.svPlayer.UpdateStats(100f, 100f, 100f, 100f);
+            target.Stats.UpdateStats(100f, 100f, 100f, 100f);
             player.SendSuccessMessage($"Refilled Stats");
         }
 
@@ -295,6 +295,12 @@ namespace BPDZ
             FileData.GoddedPlayers.Add(target.Username);
             File.AppendAllText(GodListFile, target.Username + Environment.NewLine);
             player.SendSuccessMessage(string.Format(msg, "gave"));
+        }
+
+        [Command(nameof(Heal), "Heals the player back to full HP.", "Usage: /heal [username]", new string[] { "heal" }, true)]
+        public static void Heal(Player player, Player target)
+        {
+            target.Stats.RestoreHealth();
         }
 
         [Command(nameof(TeleportToTarget), "Teleports you to another player.", "Usage: /tp [username]", new string[] { "tp", "teleport" }, true, true)]
