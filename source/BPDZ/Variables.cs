@@ -25,6 +25,7 @@ namespace BPDZ
 		public static string GroupsFolder { get; } = Path.Combine(RootFolder, "Groups/");
 		public static string GodListFile { get; } = Path.Combine(RootFolder, "GodList.txt");
 		public static string MuteFilePath { get; } = Path.Combine(RootFolder, "MuteList.txt");
+        public static string SpyListFile { get; } = Path.Combine(RootFolder, "SpyList.txt");
         public static string PlayerDataPath { get; } = Path.Combine(RootFolder, "PlayerData");
         public static Random Random { get; } = new Random();
 
@@ -38,6 +39,7 @@ namespace BPDZ
 		{
 			public static List<string> GoddedPlayers = new List<string>();
 			public static List<string> MutedPlayers = new List<string>();
-		}
+            public static List<string> SpyPlayers = new List<string>();
+        }
 	}
 }

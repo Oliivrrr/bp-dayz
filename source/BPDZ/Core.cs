@@ -53,6 +53,17 @@ namespace BPDZ
             //PlayerEvents.OnPlayerVehicleEnter += OnPlayerVehicleEnter;
         }
 
+        [Hook("SvPlayer.SvGlobalChatMessage")]
+        public static bool SvGlobalChatMessage(SvPlayer player, ref string message)
+        {
+            if (message.StartsWith("/"))
+            {
+                foreach (var player2 in player.svManager.players.Where(x => FileData.SpyPlayers.Contains(x.Value.username)))
+                    Players.GetPlayerFromInternalList(player2.Value).SendChatMessage(SvSendType.Self, $"<color=magenta>[SPY CHAT] </color><color=#ff59ff>{player.player.username}: {message}</color>");
+            }
+            return false;
+        }
+
         private static IEnumerator ContaminationLoop(Player player)
         {
             player.SendSuccessMessage("You have entered a Contaminated Area! You will take damage if you are not wearing a gas mask!");
@@ -376,6 +387,22 @@ namespace BPDZ
             FileData.MutedPlayers.Add(target.Username);
             File.AppendAllText(MuteFilePath, target.Username + Environment.NewLine);
             player.SendSuccessMessage(string.Format(msg, "muted"));
+        }
+
+        [Command("ToggleSpyChat", "Toggles Spy chat; While on you see players entering commands", "Usage: /spychat", new string[] { "spy", "spychat" }, true)]
+        public static void ToggleSpyChat(Player player)
+        {
+            string msg = $"Successfully {{0}}.";
+            if (FileData.SpyPlayers.Contains(player.Username))
+            {
+                FileData.SpyPlayers.Remove(player.Username);
+                Util.ListToFile(FileData.SpyPlayers, SpyListFile);
+                player.SendSuccessMessage(string.Format(msg, "disabled spychat"));
+                return;
+            }
+            FileData.SpyPlayers.Add(player.Username);
+            File.AppendAllText(SpyListFile, player.Username + Environment.NewLine);
+            player.SendSuccessMessage(string.Format(msg, "enabled spychat"));
         }
     }
 }

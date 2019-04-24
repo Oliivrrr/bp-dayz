@@ -18,7 +18,7 @@ namespace BPDZ
 {
     public static class Manager
     {
-        public static List<DayZGroups> GroupGrabber(Player player)
+        public static string GroupGrabber(Player player)
         {
             var ListOfGroups = new List<DayZGroups>();
             var playersGroups = new List<DayZGroups>();
@@ -38,7 +38,13 @@ namespace BPDZ
                     playersGroups.Add(group);
                 }
             }
-            return playersGroups;
+            var groupsdisplayname = "";
+            List<DayZGroups> groups = playersGroups.OrderByDescending(o => o.PermissionLevel).ToList();
+            foreach (var group in groups)
+            {
+                groupsdisplayname = $"{groupsdisplayname} <color={group.Color}>{group.DisplayName} </color>";
+            }
+            return groupsdisplayname;
         }
         public static void SvGlobalChatMessage(Player player, string message)
         {
@@ -47,17 +53,11 @@ namespace BPDZ
                 player.SendChatMessage($"&cYou are currently muted.");
                 return;
             }
-            var groupsdisplayname = "";
-            var groups = GroupGrabber(player).OrderByDescending(o => o.PermissionLevel).ToList();
-            foreach (var group in groups)
-            {
-                groupsdisplayname = $"{groupsdisplayname} <color={group.Color}>{group.DisplayName} </color>";
-            }
 
             if (!player.svPlayer.svManager.chatted.OverLimit(player.svPlayer.player))
             {
                 player.svPlayer.svManager.chatted.Add(player.svPlayer.player);
-                player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GameMessage, $"<color=#C4C4C4>[{player.ID}]</color> {groupsdisplayname} {player.svPlayer.player.username}: {message}");
+                player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GameMessage, $"<color=#C4C4C4>[{player.ID}]</color> {GroupGrabber(player)} {player.svPlayer.player.username}: {message}");
             }
         }
     }
