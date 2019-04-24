@@ -22,6 +22,7 @@ namespace BPDZ
             -633509750,
             880705339,
             -766353867,
+            -552154137,
             226920179,
             -1310874884,
             -1888685880, //T1 end
@@ -119,7 +120,7 @@ namespace BPDZ
             if (amountofitems >= 3)
             {
                 InventoryItem armourItem;
-                int itemID = Armour[Core.GenerateRandom(0, 18)];
+                int itemID = Armour[Core.GenerateRandom(0, 19)];
                 spawner.AddToMyItems(itemID, 1);
                 spawner.myItems.TryGetValue(itemID, out armourItem);
                 ShEntity armourEntity = spawner.svEntity.svManager.AddNewEntity(armourItem.item, spawner.GetPlace(), armourPos, new Quaternion(-0.7071068f, 0f, 0f, 0.7071068f), false);

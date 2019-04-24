@@ -46,7 +46,8 @@ namespace BPDZ
 			{
 				Log("Creating directory BPDayZ...");
 				Directory.CreateDirectory("BPDayZ/Groups");
-				Log("Successfully created directory");
+                Directory.CreateDirectory("BPDayZ/PlayerData");
+                Log("Successfully created directory");
 				Log("Creating files...");
 				File.Create("BPDayZ/GodList.txt");
 				File.Create("BPDayZ/DiscordLink.txt");

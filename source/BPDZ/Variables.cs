@@ -25,7 +25,8 @@ namespace BPDZ
 		public static string GroupsFolder { get; } = Path.Combine(RootFolder, "Groups/");
 		public static string GodListFile { get; } = Path.Combine(RootFolder, "GodList.txt");
 		public static string MuteFilePath { get; } = Path.Combine(RootFolder, "MuteList.txt");
-		public static Random Random { get; } = new Random();
+        public static string PlayerDataPath { get; } = Path.Combine(RootFolder, "PlayerData");
+        public static Random Random { get; } = new Random();
 
         public static string Version { get; private set; } = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
 		public static bool IsPreRelease => Version.Contains("pre");

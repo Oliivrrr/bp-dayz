@@ -16,6 +16,8 @@ using System.IO;
 using static BP_API.Core;
 using static BPDZ.Variables;
 using System.Collections;
+using BPDZ.Models;
+using Newtonsoft.Json;
 using UniversalUnityHooks;
 using Logger = BP_API.Logger;
 using Object = UnityEngine.Object;
@@ -80,7 +82,7 @@ namespace BPDZ
 
         private static IEnumerator CarLoop(Player player)
         {
-            float time = 60f;
+            
             yield return new WaitForSeconds(1f);
             while (player.shPlayer.curMount)
             {
@@ -88,7 +90,7 @@ namespace BPDZ
                 {
                     player.SendSuccessMessage("You ran out of fuel!");
                 }
-                yield return new WaitForSeconds(time);
+                yield return new WaitForSeconds(1);
                 player.Inventory.RemoveItem(1699387113, 1);
             }
         }
@@ -205,8 +207,8 @@ namespace BPDZ
             }
             Loggers.Misc.Log($"[{player.ID}] {player.Username} Registered ({player.UserData.GetIpV4()})");
             player.SendChatMessage(SvSendType.All, $"{player.Username} Joined for the first time");
-            player.Inventory.AddItem(-1975896234, 1);
-            player.Inventory.AddItem(493970259, 35);
+            player.shPlayer.TransferItem(DeltaInv.AddToMe, -1975896234, 1, true);
+            player.shPlayer.TransferItem(DeltaInv.AddToMe, 493970259, 35, true);
         }
 
         static void OnPlayerDisconnected(Player player)

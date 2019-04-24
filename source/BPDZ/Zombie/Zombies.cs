@@ -71,7 +71,7 @@ namespace BPDZ
                 {
                     if (!zombieType.Wearables.Contains(inventoryItem.item.index))
                     {
-                        player.shPlayer.TransferItem(2, inventoryItem.item.index, inventoryItem.count, true);
+                        player.shPlayer.TransferItem(DeltaInv.RemoveFromMe, inventoryItem.item.index, inventoryItem.count, true);
                     }
                 }
 

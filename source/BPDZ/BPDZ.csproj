@@ -271,6 +271,7 @@
     <Compile Include="Manager.cs" />
     <Compile Include="Models\DayZGroups.cs" />
     <Compile Include="Models\GunIndex.cs" />
+    <Compile Include="Models\Player_Data.cs" />
     <Compile Include="PlayerZ\LootDrops.cs" />
     <Compile Include="PlayerZ\PlayerZ.cs" />
     <Compile Include="Core.cs" />
