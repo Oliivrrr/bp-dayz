@@ -49,6 +49,6 @@ namespace BPDZ
             }
         }
 
-        public int Dif { get; set; }
+        public int[] Wearables { get; set; }
     }
 }

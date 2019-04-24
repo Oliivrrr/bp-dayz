@@ -19,7 +19,17 @@ namespace BPDZ
             Health = 200;
             DamageMultiplier = 2.5f;
             RunSpeed = 6f;
-            Dif = 1076848752;
+            Wearables = new[]
+            {
+                880705339, //Head
+                1089711634, //Face
+                1258964252, //Body
+                -1626497894, //Armour
+                1174688158, //Hands
+                134344360, //Legs
+                -471928380, //Feet
+                673780802 //Back
+            };
         }
     }
 }

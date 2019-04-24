@@ -60,7 +60,6 @@ namespace BPDZ
             List.Add(zombie);
             player.svPlayer.svManager.StartCoroutine(ZombieLoop(player, zombie.Type));
             player.svPlayer.svManager.StartCoroutine(Core.LookForPlayers(player.svPlayer));
-            player.shPlayer.SetWearable(zombie.Type.Dif);
             return true;
         }
 
@@ -70,12 +69,17 @@ namespace BPDZ
             {
                 foreach (InventoryItem inventoryItem in player.shPlayer.myItems.Values.ToArray())
                 {
-                    if (inventoryItem.item.index != zombieType.Dif)
+                    if (!zombieType.Wearables.Contains(inventoryItem.item.index))
                     {
                         player.shPlayer.TransferItem(2, inventoryItem.item.index, inventoryItem.count, true);
                     }
                 }
-                player.shPlayer.SetWearable(zombieType.Dif);
+
+                foreach (var WearbleID in zombieType.Wearables)
+                {
+                    player.shPlayer.SetWearable(WearbleID);
+                }
+                
                 player.svPlayer.SvTrySetJob(JobIndex.Criminal, false, false);
                 player.svPlayer.SvAddCrime(CrimeIndex.Trespassing, player.shPlayer);
                 yield return new WaitForSeconds(1f);

@@ -208,9 +208,8 @@ namespace BPDZ
                 return;
             }
             Loggers.Misc.Log($"[{player.ID}] {player.Username} Registered ({player.UserData.GetIpV4()})");
-            player.SendChatMessage(SvSendType.All, $"{player.Username} Registered!");
+            player.SendChatMessage(SvSendType.All, $"{player.Username} Joined for the first time");
             player.Inventory.AddItem(-1975896234, 1);
-            player.Inventory.AddItem(-1627168389, 1);
             player.Inventory.AddItem(493970259, 35);
         }
 
@@ -250,6 +249,19 @@ namespace BPDZ
         {
             player.SendServerInfoMessage(SvSendType.Self, File.ReadAllText("server_info.txt"));
             player.SendSuccessMessage($"Opened help menu");
+        }
+
+        [Command(nameof(Feed), "Refills all stat bars.", "Usage: /feed", new string[] { "feed", "f" })]
+        public static void Feed(Player player)
+        {
+            player.svPlayer.UpdateStats(100f, 100f, 100f, 100f);
+            player.SendSuccessMessage($"Refilled Stats");
+        }
+
+        [Command(nameof(StaffChatMessage), "Sends a message to staff chat.", "Usage: /sc [message]", new string[] { "sc", "staffchat" }, true, true)]
+        public static void StaffChatMessage(Player player, string message)
+        {
+            player.SendStaffMessage(message);
         }
 
         [Command(nameof(ClearItems), "Clears the inventory of target player.", "Usage: /clear [username]", new string[] { "spawnzombie", "zombie" }, true, true)]

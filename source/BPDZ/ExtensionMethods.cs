@@ -44,5 +44,15 @@ namespace BPDZ
         {
             SendPrefixedMessage(player, "<color=green>[BPDZ]</color><color=yellow>", str + "</color>");
         }
+        /// <summary>
+        /// Sends a message to all staff.
+        /// </summary>
+        /// <param name="player">The user to send the message to</param>
+        /// <param name="str">The message that you want to send. This text will be yellow.</param>
+        public static void SendStaffMessage(this Player sender, string str)
+        {
+            foreach (var player in sender.svPlayer.svManager.players.Where(x => x.Value.admin))
+                Players.GetPlayerFromInternalList(player.Value).SendChatMessage(SvSendType.Self, $"<color=purple>[STAFF CHAT]</color><color=#74B999> {sender.shPlayer.username}: {str}</color>");
+        }
     }
 }
