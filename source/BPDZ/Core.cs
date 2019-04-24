@@ -283,7 +283,7 @@ namespace BPDZ
             player.SendStaffMessage($"{player.Username}: {message}");
         }
 
-        [Command(nameof(ClearItems), "Clears the inventory of target player.", "Usage: /clear [username]", new string[] { "spawnzombie", "zombie" }, true, true)]
+        [Command(nameof(ClearItems), "Clears the inventory of target player.", "Usage: /clearinventory [username]", new string[] { "clearinventory", "clearinv" }, true, true)]
         public static void ClearItems(Player player, string target)
         {
             Player targetPlayer = Players.GetPlayerByUsername(target);
