@@ -259,10 +259,17 @@ namespace BPDZ
             player.SendSuccessMessage($"Refilled Stats");
         }
 
+        [Command(nameof(Sudo), "Executes a message for specified player.", "Usage: /sudo [username]", new string[] { "sudo" }, true, true)]
+        public static void Sudo(Player player, Player target, string message)
+        {
+            target.svPlayer.SvGlobalChatMessage(message);
+            player.SendStaffMessage($"Sudo'd {target.Username} with {message}");
+        }
+
         [Command(nameof(StaffChatMessage), "Sends a message to staff chat.", "Usage: /sc [message]", new string[] { "sc", "staffchat" }, true, true)]
         public static void StaffChatMessage(Player player, string message)
         {
-            player.SendStaffMessage(message);
+            player.SendStaffMessage($"{player.Username}: {message}");
         }
 
         [Command(nameof(ClearItems), "Clears the inventory of target player.", "Usage: /clear [username]", new string[] { "spawnzombie", "zombie" }, true, true)]

@@ -52,7 +52,7 @@ namespace BPDZ
         public static void SendStaffMessage(this Player sender, string str)
         {
             foreach (var player in sender.svPlayer.svManager.players.Where(x => x.Value.admin))
-                Players.GetPlayerFromInternalList(player.Value).SendChatMessage(SvSendType.Self, $"<color=purple>[STAFF CHAT]</color><color=#74B999> {sender.shPlayer.username}: {str}</color>");
+                Players.GetPlayerFromInternalList(player.Value).SendChatMessage(SvSendType.Self, $"<color=purple>[STAFF CHAT]</color><color=#74B999> {str}</color>");
         }
     }
 }
