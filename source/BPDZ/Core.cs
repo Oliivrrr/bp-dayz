@@ -333,11 +333,19 @@ namespace BPDZ
             target.shPlayer.Reset(player.Location.GetPosition(), player.Location.GetRotation(), player.Location.GetPositionT());
             player.SendSuccessMessage($"Successfully teleported {target.FilteredUsername} to yourself.");
         }
+
         [Command("Kick", "Disconnects a player from the server for 10mins", "Usage: /kick [playerID] [reason]", new string[] { "kick" }, true, true)]
         public static void KickPlayer(Player player, Player target, string reason)
         {
             target.Kick(reason);
             player.SendSuccessMessage($"Successfully kicked {target.FilteredUsername} for {reason}.");
+        }
+
+        [Command("Disconnect", "Disconnects a player from the server", "Usage: /disconnect [playerID]", new string[] { "disconnect" }, true, true)]
+        public static void Disconnect(Player player, Player target, string reason)
+        {
+            target.svPlayer.svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Normal);
+            player.SendSuccessMessage($"Successfully disconnected {target.FilteredUsername}.");
         }
 
         [Command("Ban", "Bans a player from the server", "Usage: /ban [playerID] [reason]", new string[] { "ban" }, true, true)]
