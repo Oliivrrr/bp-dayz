@@ -44,7 +44,6 @@ namespace BPDZ
         static void RegisterEvents()
         {
             PlayerEvents.OnPlayerConnected += OnPlayerConnected;
-            PlayerEvents.OnPlayerDisconnected += OnPlayerDisconnected;
             PlayerEvents.OnPlayerDamage += OnPlayerDamage;
             PlayerEvents.OnGlobalChatMessage += SvGlobalChatMessage;
             PlayerEvents.OnPlayerCrime += OnPlayerCrime;
@@ -67,7 +66,7 @@ namespace BPDZ
         private static IEnumerator ContaminationLoop(Player player)
         {
             player.SendSuccessMessage("You have entered a Contaminated Area! You will take damage if you are not wearing a gas mask!");
-            while (player.shPlayer.GetPosition().x < -252)
+            while (player.shPlayer.GetPosition().x < -252 && player.IsServerSide())
             {
                 yield return new WaitForSeconds(4f);
                 if (player.shPlayer.GetWearable(WearableType.Head) != null)
@@ -109,20 +108,34 @@ namespace BPDZ
         static void OnStartServer(SvManager svMan)
         {
             svMan.startMoney = 0;
-            svMan.StartCoroutine(SpawnLootLoop(svMan));
+            svMan.StartCoroutine(SpawnLoop(svMan));
         }
 
-        private static IEnumerator SpawnLootLoop(SvManager svMan)
+        private static IEnumerator SpawnLoop(SvManager svMan)
         {
             while (true)
             {
+                foreach (var entity in svMan.manager.entities)
+                {
+                    if (entity != null)
+                    {
+                        Player player = Players.GetPlayerFromInternalList(entity as ShPlayer);
+                        if (player != null)
+                        {
+                            if (player.svPlayer.GetTerritory() != null && player.Job.PlayerJob is Gangster)
+                            {
+                                //Loggers.Chat.Log($"{player.Username}: {player.svPlayer.GetTerritory().}");
+                            }
+                        }
+                    }
+                }
                 ShPlayer randomPlayer = svMan.GetRandomRealPlayer();
                 if (randomPlayer != null)
                 {
                     if (!randomPlayer.isUnderwater)
                     {
                         LootDrops.Initialize(randomPlayer);
-                        yield return new WaitForSeconds(45f / randomPlayer.svPlayer.svManager.players.Count);
+                        yield return new WaitForSeconds(5f / randomPlayer.svPlayer.svManager.players.Count);
                     }
                 }
                 yield return new WaitForSeconds(1f);
@@ -160,7 +173,8 @@ namespace BPDZ
                 {
                     player.SendChatMessage(SvSendType.All, $"<color=red>{player.Username} killed {Players.GetPlayerByID(victim.ID).Username} using {player.shPlayer.curEquipable.itemName}</color>");
                     Debug.Log($"[BPDZ] {player.Username} killed {Players.GetPlayerByID(victim.ID).Username}");
-                    return false;
+                    player.svPlayer.SvAddCrime(CrimeIndex.Murder, victim);
+                    return true;
                 }
                 else if (player.IsServerSide() && !victim.svEntity.serverside)
                 {
@@ -223,11 +237,6 @@ namespace BPDZ
             player.SendChatMessage(SvSendType.All, $"{player.Username} Joined for the first time");
             player.shPlayer.TransferItem(DeltaInv.AddToMe, -1975896234, 1, true);
             player.shPlayer.TransferItem(DeltaInv.AddToMe, 493970259, 35, true);
-        }
-
-        static void OnPlayerDisconnected(Player player)
-        {
-            Loggers.Misc.Log($"[{player.ID}] {player.Username} Left the server");
         }
 
         public static Vector3 RandomPosition(Vector3 curPosition)
@@ -302,6 +311,12 @@ namespace BPDZ
             player.SendSuccessMessage($"Successfully Spawned Loot Drop!");
         }
 
+        [Command(nameof(Atm), "Atm.", "Usage: /atm", new string[] { "atm" })]
+        public static void Atm(Player player)
+        {
+            Help(player);
+        }
+
         [Command(nameof(Godmode), "Prevents the player from taking damage.", "Usage: /god [username]", new string[] { "godmode", "god" }, true)]
         public static void Godmode(Player player, Player target)
         {
@@ -327,21 +342,21 @@ namespace BPDZ
         [Command(nameof(TeleportToTarget), "Teleports you to another player.", "Usage: /tp [username]", new string[] { "tp", "teleport" }, true, true)]
         public static void TeleportToTarget(Player player, Player target)
         {
-            player.shPlayer.Reset(target.Location.GetPosition(), target.Location.GetRotation(), target.Location.GetPositionT());
+            player.svPlayer.SvReset(target.Location.GetPosition(), target.Location.GetRotation(), target.Location.GetPlaceIndex());
             player.SendSuccessMessage($"Successfully teleported to {target.FilteredUsername}");
         }
 
         [Command(nameof(Give), "Gives the player an item.", "Usage: /give [itemID]", new string[] { "give" }, true, true)]
         public static void Give(Player player, int itemID, int amount)
         {
-            player.Inventory.AddItem(itemID, amount);
+            player.shPlayer.TransferItem(DeltaInv.AddToMe, itemID, amount, true);
             player.SendSuccessMessage($"Successfully gave you {amount} {player.Inventory.GetItem(itemID).item.itemName}(s)");
         }
 
         [Command(nameof(TeleportToSender), "Teleports a player to you.", "Usage: /tphere [username]", new string[] { "tph", "tphere" }, true, true)]
         public static void TeleportToSender(Player player, Player target)
         {
-            target.shPlayer.Reset(player.Location.GetPosition(), player.Location.GetRotation(), player.Location.GetPositionT());
+            target.svPlayer.SvReset(player.Location.GetPosition(), player.Location.GetRotation(), player.Location.GetPlaceIndex());
             player.SendSuccessMessage($"Successfully teleported {target.FilteredUsername} to yourself.");
         }
 
@@ -370,7 +385,7 @@ namespace BPDZ
         [Command("Discord Link", "Sends you the link to the discord server", "Usage: /discord", new string[] { "discord", "discordlink" }, true, true)]
         public static void SendDiscordLink(Player player)
         {
-            player.SendInfoMessage($"Discord link: (link here)");
+            player.SendInfoMessage($"Discord link: {FileData.DiscordLink}");
         }
 
         [Command("Mute", "Mutes a player on the server", "Usage: /mute [username]", new string[] { "mute" }, true)]

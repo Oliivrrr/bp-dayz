@@ -27,6 +27,7 @@ namespace BPDZ
 		public static string MuteFilePath { get; } = Path.Combine(RootFolder, "MuteList.txt");
         public static string SpyListFile { get; } = Path.Combine(RootFolder, "SpyList.txt");
         public static string PlayerDataPath { get; } = Path.Combine(RootFolder, "PlayerData");
+        public static string DiscordPath { get; } = Path.Combine(RootFolder, "DiscordLink.txt");
         public static Random Random { get; } = new Random();
 
         public static string Version { get; private set; } = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
@@ -40,6 +41,7 @@ namespace BPDZ
 			public static List<string> GoddedPlayers = new List<string>();
 			public static List<string> MutedPlayers = new List<string>();
             public static List<string> SpyPlayers = new List<string>();
+            public static string DiscordLink;
         }
 	}
 }

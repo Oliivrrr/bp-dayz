@@ -65,6 +65,7 @@ namespace BPDZ
 			FileData.GoddedPlayers = File.ReadAllLines(GodListFile).ToList();
 			FileData.MutedPlayers = File.ReadAllLines(MuteFilePath).ToList();
             FileData.SpyPlayers = File.ReadAllLines(SpyListFile).ToList();
+            FileData.DiscordLink = File.ReadAllText(DiscordPath);
         }
 
         /// <summary>

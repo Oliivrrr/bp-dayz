@@ -109,7 +109,7 @@ namespace BPDZ
                 foodItemID = Food[Core.GenerateRandom(0, 10)];
                 spawner.AddToMyItems(foodItemID, 1);
                 spawner.myItems.TryGetValue(foodItemID, out foodItem);
-                ShEntity FoodEntity = spawner.svEntity.svManager.AddNewEntity(foodItem.item, spawner.GetPlace(), spawnerPos, spawner.GetRotation(), false);
+                ShEntity FoodEntity = spawner.svEntity.svManager.AddNewEntity(foodItem.item, spawner.GetPlace(), spawnerPos, new Quaternion(0f, 0f, 0f, 0), false);
                 FoodEntity.svEntity.svManager.StartCoroutine(Core.KillDelay(FoodEntity, LootDropDespawnTime));
             }
 
@@ -139,7 +139,7 @@ namespace BPDZ
             {
                 InventoryItem gunItem;
                 gunItemID = Gun[Core.GenerateRandom(0, 14)];
-                spawner.AddToMyItems(gunItemID, 1);
+                spawner.TransferItem(DeltaInv.AddToMe, gunItemID, 1, true);
                 spawner.myItems.TryGetValue(gunItemID, out gunItem);
                 ShEntity gunEntity = spawner.svEntity.svManager.AddNewEntity(gunItem.item, spawner.GetPlace(), gunPos, new Quaternion(0f, 0f, 0.7071068f, 0.7071068f), false);
                 gunEntity.svEntity.svManager.StartCoroutine(Core.KillDelay(gunEntity, LootDropDespawnTime));
