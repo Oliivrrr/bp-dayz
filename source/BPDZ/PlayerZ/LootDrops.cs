@@ -15,7 +15,7 @@ namespace BPDZ
 {
     class LootDrops
     {
-        public static float LootDropDespawnTime = 90f;
+        public static float LootDropDespawnTime = 45f;
 
         public static int[] Armour = new int[]
         {
@@ -87,64 +87,59 @@ namespace BPDZ
             -1572858027 //T4 end
         };
 
-        public static void Initialize(ShPlayer player)
+        public static void Initialize(ShPlayer player, int tier)
         {
             int foodItemID;
             int ammoItemID;
             int armourItemID;
             int gunItemID;
-            ShEntity spawner = player.svPlayer.svManager.AddNewEntity(player.manager.hands, player.GetPlace(),
-            player.GetPosition(), player.GetRotation(), false);
-            int amountofitems = Core.GenerateRandom(1, 4);
-            Vector3 spawnerPos = new Vector3(Core.RandomPosition(spawner.GetPosition()).x, 0f,
-            Core.RandomPosition(spawner.GetPosition()).z);
-            Core.RandomPosition(spawner.GetPosition());
-            Vector3 armourPos = new Vector3(spawnerPos.x, 0f, spawnerPos.z);
-            Vector3 ammoPos = new Vector3(spawnerPos.x + 2f, 0f, spawnerPos.z - 2f);
-            Vector3 gunPos = new Vector3(spawnerPos.x - 2, 0f, spawnerPos.z);
+            Vector3 spawnerPos = player.GetPosition();
+            Vector3 armourPos = new Vector3(spawnerPos.x, spawnerPos.y, spawnerPos.z);
+            Vector3 ammoPos = new Vector3(spawnerPos.x + spawnerPos.y, 0f, spawnerPos.z - 2f);
+            Vector3 gunPos = new Vector3(spawnerPos.x - 2, spawnerPos.y, spawnerPos.z);
 
-            if (amountofitems >= 1)
+            if (tier == 1)
             {
                 InventoryItem foodItem;
                 foodItemID = Food[Core.GenerateRandom(0, 10)];
-                spawner.AddToMyItems(foodItemID, 1);
-                spawner.myItems.TryGetValue(foodItemID, out foodItem);
-                ShEntity FoodEntity = spawner.svEntity.svManager.AddNewEntity(foodItem.item, spawner.GetPlace(), spawnerPos, new Quaternion(0f, 0f, 0f, 0), false);
+                player.AddToMyItems(foodItemID, 1);
+                player.myItems.TryGetValue(foodItemID, out foodItem);
+                ShEntity FoodEntity = player.svEntity.svManager.AddNewEntity(foodItem.item, player.GetPlace(), spawnerPos, new Quaternion(0f, 0f, 0f, 0), false);
                 FoodEntity.svEntity.svManager.StartCoroutine(Core.KillDelay(FoodEntity, LootDropDespawnTime));
             }
 
-            if (amountofitems >= 2)
+            if (tier == 2)
             {
                 InventoryItem caseItem;
                 ammoItemID = Ammo[Core.GenerateRandom(0, 6)];
-                spawner.AddToMyItems(-667273670, 1);
-                spawner.myItems.TryGetValue(-667273670, out caseItem);
-                ShEntity ammoCase = spawner.svEntity.svManager.AddNewEntity(caseItem.item, spawner.GetPlace(), ammoPos, new Quaternion(0f, 0f, 0f, 0), false);
+                player.AddToMyItems(-667273670, 1);
+                player.myItems.TryGetValue(-667273670, out caseItem);
+                ShEntity ammoCase = player.svEntity.svManager.AddNewEntity(caseItem.item, player.GetPlace(), ammoPos, new Quaternion(0f, 0f, 0f, 0), false);
                 ammoCase.AddToMyItems(ammoItemID, Core.GenerateRandom(20, 35));
                 ammoCase.svEntity.destroyEmpty = true;
                 ammoCase.svEntity.svManager.StartCoroutine(Core.KillDelay(ammoCase, LootDropDespawnTime));
             }
 
-            if (amountofitems >= 3)
+            if (tier == 3)
             {
                 InventoryItem armourItem;
                 armourItemID = Armour[Core.GenerateRandom(0, 19)];
-                spawner.AddToMyItems(armourItemID, 1);
-                spawner.myItems.TryGetValue(armourItemID, out armourItem);
-                ShEntity armourEntity = spawner.svEntity.svManager.AddNewEntity(armourItem.item, spawner.GetPlace(), armourPos, new Quaternion(-0.7071068f, 0f, 0f, 0.7071068f), false);
+                player.AddToMyItems(armourItemID, 1);
+                player.myItems.TryGetValue(armourItemID, out armourItem);
+                ShEntity armourEntity = player.svEntity.svManager.AddNewEntity(armourItem.item, player.GetPlace(), armourPos, new Quaternion(-0.7071068f, 0f, 0f, 0.7071068f), false);
                 armourEntity.svEntity.svManager.StartCoroutine(Core.KillDelay(armourEntity, LootDropDespawnTime));
             }
 
-            if (amountofitems == 4)
+            if (tier >= 4)
             {
                 InventoryItem gunItem;
                 gunItemID = Gun[Core.GenerateRandom(0, 14)];
-                spawner.TransferItem(DeltaInv.AddToMe, gunItemID, 1, true);
-                spawner.myItems.TryGetValue(gunItemID, out gunItem);
-                ShEntity gunEntity = spawner.svEntity.svManager.AddNewEntity(gunItem.item, spawner.GetPlace(), gunPos, new Quaternion(0f, 0f, 0.7071068f, 0.7071068f), false);
+                player.TransferItem(DeltaInv.AddToMe, gunItemID, 1, true);
+                player.myItems.TryGetValue(gunItemID, out gunItem);
+                ShEntity gunEntity = player.svEntity.svManager.AddNewEntity(gunItem.item, player.GetPlace(), gunPos, new Quaternion(0f, 0f, 0.7071068f, 0.7071068f), false);
                 gunEntity.svEntity.svManager.StartCoroutine(Core.KillDelay(gunEntity, LootDropDespawnTime));
             }
-            spawner.Destroy();
+            player.svPlayer.Despawn();
         }
     }
 }

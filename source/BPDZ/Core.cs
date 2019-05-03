@@ -16,6 +16,7 @@ using System.IO;
 using static BP_API.Core;
 using static BPDZ.Variables;
 using System.Collections;
+using System.ComponentModel.Design;
 using BPDZ.Models;
 using Newtonsoft.Json;
 using UniversalUnityHooks;
@@ -24,7 +25,7 @@ using Object = UnityEngine.Object;
 
 namespace BPDZ
 {
-    public class Core
+    public static class Core
     {
         [EntryPoint(resourceName)]
         public static void Main()
@@ -49,7 +50,22 @@ namespace BPDZ
             PlayerEvents.OnPlayerCrime += OnPlayerCrime;
             PlayerEvents.OnNpcSpawned += Zombies.SpawnZombie;
             ServerEvents.OnStartServer += OnStartServer;
+            PlayerEvents.OnLocalChatMessage += OnLocalChatMessage;
+            PlayerEvents.OnPlayerVoiceChat += OnPlayerVoiceChat;
             //PlayerEvents.OnPlayerVehicleEnter += OnPlayerVehicleEnter;
+        }
+
+        private static bool OnPlayerVoiceChat(Player player, ref byte[] voiceData)
+        {
+            foreach (var player2 in player.svPlayer.svManager.players.Where(x => x.Value.myItems.ContainsKey(2046665206) && x.Value != player.shPlayer))
+                player2.Value.svPlayer.Send(SvSendType.Self, Channel.Unreliable, ClPacket.VoiceChat, player2.Value.ID, voiceData);
+            return true;
+        }
+
+        private static bool OnLocalChatMessage(Player player, ref string message)
+        {
+            player.SendLocalMessage(message);
+            return true;
         }
 
         [Hook("SvPlayer.SvGlobalChatMessage")]
@@ -63,25 +79,70 @@ namespace BPDZ
             return false;
         }
 
+        [Hook("SvPlayer.SvView")]
+        public static bool SvView(SvPlayer player, ref int otherID)
+        {
+            if (player.GetTerritory() != null)
+            {
+                if (player.GetTerritory().ownerIndex != player.player.job.jobIndex)
+                {
+                    Players.GetPlayerFromInternalList(player.player).SendSuccessMessage($"Your gang must own this territory to access this");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [Hook("SvPlayer.SvCollect")]
+        public static bool SvCollect(SvPlayer player, ref int collectedID)
+        {
+            if (player.GetTerritory() != null)
+            {
+                if (player.GetTerritory().ownerIndex != player.player.job.jobIndex)
+                {
+                    Players.GetPlayerFromInternalList(player.player).SendSuccessMessage($"Your gang must own this territory to access this");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [Hook("SvPlayer.SvEnterPlace")]
+        public static bool SvEnterPlace(SvPlayer player, ref int doorID, ref ShPlayer sender)
+        {
+            if (sender.svPlayer.GetTerritory() != null)
+            {
+                if (sender.svPlayer.GetTerritory().ownerIndex != sender.job.jobIndex)
+                {
+                    Players.GetPlayerFromInternalList(sender).SendSuccessMessage($"Your gang must own this territory to access this");
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private static IEnumerator ContaminationLoop(Player player)
         {
-            player.SendSuccessMessage("You have entered a Contaminated Area! You will take damage if you are not wearing a gas mask!");
-            while (player.shPlayer.GetPosition().x < -252 && player.IsServerSide())
+            if (player.shPlayer.GetPosition().x < -999999 && !player.IsServerSide())
             {
-                yield return new WaitForSeconds(4f);
-                if (player.shPlayer.GetWearable(WearableType.Head) != null)
+                player.SendSuccessMessage("You have entered a Contaminated Area! You will take damage if you are not wearing a gas mask!");
+                while (player.shPlayer.GetPosition().x < -252 && !player.IsServerSide())
                 {
-                    if (player.shPlayer.GetWearable(WearableType.Head).index != -1627168389)
+                    yield return new WaitForSeconds(4f);
+                    if (player.shPlayer.GetWearable(WearableType.Head) != null)
+                    {
+                        if (player.shPlayer.GetWearable(WearableType.Head).index != -1627168389)
+                        {
+                            player.svPlayer.Damage(DamageIndex.Null, 5f, player.shPlayer, player.shPlayer.headCollider);
+                        }
+                    }
+                    else if (player.shPlayer.GetWearable(WearableType.Head) == null)
                     {
                         player.svPlayer.Damage(DamageIndex.Null, 5f, player.shPlayer, player.shPlayer.headCollider);
                     }
                 }
-                else if(player.shPlayer.GetWearable(WearableType.Head) == null)
-                {
-                    player.svPlayer.Damage(DamageIndex.Null, 5f, player.shPlayer, player.shPlayer.headCollider);
-                }
+                player.SendSuccessMessage("You left the Contaminated Area");
             }
-            player.SendSuccessMessage("You left the Contaminated Area");
         }
 
         private static bool OnPlayerVehicleEnter(Player player, ref int seat)
@@ -92,7 +153,6 @@ namespace BPDZ
 
         private static IEnumerator CarLoop(Player player)
         {
-            
             yield return new WaitForSeconds(1f);
             while (player.shPlayer.curMount)
             {
@@ -108,38 +168,6 @@ namespace BPDZ
         static void OnStartServer(SvManager svMan)
         {
             svMan.startMoney = 0;
-            svMan.StartCoroutine(SpawnLoop(svMan));
-        }
-
-        private static IEnumerator SpawnLoop(SvManager svMan)
-        {
-            while (true)
-            {
-                foreach (var entity in svMan.manager.entities)
-                {
-                    if (entity != null)
-                    {
-                        Player player = Players.GetPlayerFromInternalList(entity as ShPlayer);
-                        if (player != null)
-                        {
-                            if (player.svPlayer.GetTerritory() != null && player.Job.PlayerJob is Gangster)
-                            {
-                                //Loggers.Chat.Log($"{player.Username}: {player.svPlayer.GetTerritory().}");
-                            }
-                        }
-                    }
-                }
-                ShPlayer randomPlayer = svMan.GetRandomRealPlayer();
-                if (randomPlayer != null)
-                {
-                    if (!randomPlayer.isUnderwater)
-                    {
-                        LootDrops.Initialize(randomPlayer);
-                        yield return new WaitForSeconds(5f / randomPlayer.svPlayer.svManager.players.Count);
-                    }
-                }
-                yield return new WaitForSeconds(1f);
-            }
         }
 
         static public IEnumerator LookForPlayers(SvPlayer player)
@@ -184,8 +212,10 @@ namespace BPDZ
 
             if (crimeIndex == CrimeIndex.Trespassing)
             {
-                if (player.svPlayer.serverside)
+                if (player.svPlayer.GetTerritory() != null && player.Job.PlayerJob is Gangster && player.IsServerSide())
                 {
+                    player.svPlayer.SvTrySetJob((byte)player.svPlayer.GetTerritory().ownerIndex, true, false);
+                    player.svPlayer.svManager.StartCoroutine(LookForPlayers(player.svPlayer));
                     return false;
                 }
                 player.svPlayer.svManager.StartCoroutine(ContaminationLoop(player));
@@ -204,6 +234,8 @@ namespace BPDZ
                         if (attacker.shPlayer.username == zombie.Player.player.username)
                         {
                             player.svPlayer.Damage(DamageIndex.Null, amount * zombie.Type.DamageMultiplier, player.shPlayer, collider);
+                            if(GenerateRandom(1, 100) <= 2000/(int)player.Stats.Health)
+                                FileData.InfectedPlayers.Add(player.Username);
                             return true;
                         }
                     }
@@ -217,6 +249,18 @@ namespace BPDZ
                 return true;
             }
             return false;
+        }
+
+        static public IEnumerator PlayerBleed(Player player, float time)
+        {
+            player.shPlayer.StartEffect(EffectIndex.Intoxicated);
+            while (!player.shPlayer.IsDead() && time != 0)
+            {
+                yield return new WaitForSeconds(10f);
+                time = time - 10f;
+                player.svPlayer.Damage(DamageIndex.Null, GenerateRandomF(7, 13), player.shPlayer, player.shPlayer.headCollider);
+                player.SendSuccessMessage("You are bleeding. Consume medkits or get another player to heal you");
+            }
         }
 
         static bool SvGlobalChatMessage(Player player, ref string message)
@@ -237,13 +281,6 @@ namespace BPDZ
             player.SendChatMessage(SvSendType.All, $"{player.Username} Joined for the first time");
             player.shPlayer.TransferItem(DeltaInv.AddToMe, -1975896234, 1, true);
             player.shPlayer.TransferItem(DeltaInv.AddToMe, 493970259, 35, true);
-        }
-
-        public static Vector3 RandomPosition(Vector3 curPosition)
-        {
-            int num = GenerateRandom(1, 3);
-            Vector3 f = new Vector3(curPosition.x - (-8 * num), curPosition.y, curPosition.z - (-8 ^ num)); // Still working on better position management
-            return f;
         }
 
         public static IEnumerator KillDelay(ShEntity entity, float time)
@@ -279,6 +316,24 @@ namespace BPDZ
             player.SendSuccessMessage($"Refilled Stats");
         }
 
+        [Command(nameof(GangChat), "Sends a message to gang members", "Usage: /gangchat [message]", new string[] { "gangchat", "gc" }, false, true)]
+        public static void GangChat(Player player, string message)
+        {
+            if (player.Job.PlayerJob is Gangster)
+            {
+                foreach (var player2 in player.svPlayer.svManager.players.Where(x => x.Value.job.jobIndex == player.Job.PlayerJob.jobIndex))
+                    Players.GetPlayerFromInternalList(player2.Value).SendChatMessage(SvSendType.Self, $"<color=#{ColorUtility.ToHtmlStringRGB(player.Job.PlayerJob.info.jobColor)}>[{player.Job.PlayerJob.info.jobName.ToUpper()} CHAT] {player.Username}: {message}</color>");
+            }
+            player.SendSuccessMessage("You are not in a gang");
+        }
+
+        [Command(nameof(SetJob), "Sets the job for specified player.", "Usage: /setjob [username] [jobindex]", new string[] { "setjob" }, true, true)]
+        public static void SetJob(Player player, Player target, byte jobIndex)
+        {
+            target.svPlayer.SvTrySetJob(jobIndex, true, false);
+            player.SendSuccessMessage($"Gave {target.Username} the job {target.Job.PlayerJob.info.jobName}");
+        }
+
         [Command(nameof(Sudo), "Executes a message for specified player.", "Usage: /sudo [username]", new string[] { "sudo" }, true, true)]
         public static void Sudo(Player player, Player target, string message)
         {
@@ -304,10 +359,10 @@ namespace BPDZ
             targetPlayer.SendSuccessMessage($"Your Inventory Was Cleared by {player.Username}");
         }
 
-        [Command(nameof(SpawnLootDrop), "Spawn a Loot Drop.", "Usage: /spawndrop", new string[] { "spawndrop", "lootdrop" }, true, true)]
-        public static void SpawnLootDrop(Player player)
+        [Command(nameof(SpawnLootDrop), "Spawn a Loot Drop.", "Usage: /spawndrop [tier]", new string[] { "spawndrop", "lootdrop" }, true, true)]
+        public static void SpawnLootDrop(Player player, int tier)
         {
-            LootDrops.Initialize(player.shPlayer);
+            LootDrops.Initialize(player.shPlayer, tier);
             player.SendSuccessMessage($"Successfully Spawned Loot Drop!");
         }
 
@@ -342,7 +397,7 @@ namespace BPDZ
         [Command(nameof(TeleportToTarget), "Teleports you to another player.", "Usage: /tp [username]", new string[] { "tp", "teleport" }, true, true)]
         public static void TeleportToTarget(Player player, Player target)
         {
-            player.svPlayer.SvReset(target.Location.GetPosition(), target.Location.GetRotation(), target.Location.GetPlaceIndex());
+            player.svPlayer.SvTeleport(target.ID);
             player.SendSuccessMessage($"Successfully teleported to {target.FilteredUsername}");
         }
 
@@ -356,7 +411,7 @@ namespace BPDZ
         [Command(nameof(TeleportToSender), "Teleports a player to you.", "Usage: /tphere [username]", new string[] { "tph", "tphere" }, true, true)]
         public static void TeleportToSender(Player player, Player target)
         {
-            target.svPlayer.SvReset(player.Location.GetPosition(), player.Location.GetRotation(), player.Location.GetPlaceIndex());
+            target.svPlayer.SvTeleport(player.ID);
             player.SendSuccessMessage($"Successfully teleported {target.FilteredUsername} to yourself.");
         }
 
@@ -370,8 +425,8 @@ namespace BPDZ
         [Command("Disconnect", "Disconnects a player from the server", "Usage: /disconnect [playerID]", new string[] { "disconnect" }, true, true)]
         public static void Disconnect(Player player, Player target, string reason)
         {
-            target.svPlayer.svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Normal);
             player.SendSuccessMessage($"Successfully disconnected {target.FilteredUsername}.");
+            target.svPlayer.svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Normal);
         }
 
         [Command("Ban", "Bans a player from the server", "Usage: /ban [playerID] [reason]", new string[] { "ban" }, true, true)]

@@ -16,11 +16,16 @@ namespace BPDZ
         [Hook("ShPlayer.RemoveItemsDeath")]
         public static bool RemoveItemsDeath(ShPlayer player)
         {
-            foreach (InventoryItem inventoryItem in player.myItems.Values.ToList())
+            if (!player.svPlayer.serverside)
             {
-                player.TransferItem(DeltaInv.RemoveFromMe, inventoryItem.item.index, player.MyItemCount(inventoryItem.item.index), true);
+                foreach (InventoryItem inventoryItem in player.myItems.Values.ToList())
+                {
+                    player.TransferItem(DeltaInv.RemoveFromMe, inventoryItem.item.index,
+                        player.MyItemCount(inventoryItem.item.index), true);
+                }
+                return false;
             }
-            return false;
+            return true;
         }
     }
 }

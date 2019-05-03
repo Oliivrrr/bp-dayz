@@ -28,6 +28,9 @@ namespace BPDZ
         public static string SpyListFile { get; } = Path.Combine(RootFolder, "SpyList.txt");
         public static string PlayerDataPath { get; } = Path.Combine(RootFolder, "PlayerData");
         public static string DiscordPath { get; } = Path.Combine(RootFolder, "DiscordLink.txt");
+        public static string GangsPath { get; } = Path.Combine(RootFolder, "Gangs/");
+        public static string BleedingFile { get; } = Path.Combine(RootFolder, "BleedingList.txt");
+        public static string InfectedPath { get; } = Path.Combine(RootFolder, "InfectedList.txt");
         public static Random Random { get; } = new Random();
 
         public static string Version { get; private set; } = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
@@ -41,6 +44,8 @@ namespace BPDZ
 			public static List<string> GoddedPlayers = new List<string>();
 			public static List<string> MutedPlayers = new List<string>();
             public static List<string> SpyPlayers = new List<string>();
+            public static List<string> BleedingPlayers = new List<string>();
+            public static List<string> InfectedPlayers = new List<string>();
             public static string DiscordLink;
         }
 	}

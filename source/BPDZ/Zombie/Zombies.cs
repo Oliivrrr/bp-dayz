@@ -22,45 +22,77 @@ namespace BPDZ
         public static IEnumerable<Zombie> GetZombies() => List;
         public static IEnumerable<Zombie> GetAliveZombies() => List.Where(x=>x.Alive);
 
-        public static bool SpawnZombie(Player player, ref Vector3 position, ref Quaternion rotation, ref Place place,
-            ref Waypoint node, ref ShPlayer spawner, ref ShMountable mount, ref ShPlayer enemy)
+        public static bool SpawnZombie(Player player, ref Vector3 position, ref Quaternion rotation, ref Place place, ref Waypoint node, ref ShPlayer spawner, ref ShMountable mount, ref ShPlayer enemy)
         {
-            var zombie = new Zombie(player.svPlayer);
-            int TypeChance = Core.GenerateRandom(1, 100);
-            if (TypeChance == new ZombieKing(player.svPlayer).Rarity)
+            if (mount == null)
             {
-                zombie.Type = new ZombieKing(player.svPlayer);
-            }
-            else if (TypeChance <= new Slug(player.svPlayer).Rarity)
-            {
-                zombie.Type = new Slug(player.svPlayer);
-            }
-            else if (TypeChance <= new Runner(player.svPlayer).Rarity)
-            {
-                zombie.Type = new Runner(player.svPlayer);
-            }
-            else
-            {
-                zombie.Type = new Meekling(player.svPlayer);
+                var zombie = new Zombie(player.svPlayer);
+                int TypeChance = Core.GenerateRandom(1, 100);
+                if (TypeChance == new ZombieKing(player.svPlayer).Rarity)
+                {
+                    zombie.Type = new ZombieKing(player.svPlayer);
+                }
+                else if (TypeChance <= new Slug(player.svPlayer).Rarity)
+                {
+                    zombie.Type = new Slug(player.svPlayer);
+                }
+                else if (TypeChance <= new Runner(player.svPlayer).Rarity)
+                {
+                    zombie.Type = new Runner(player.svPlayer);
+                }
+                else
+                {
+                    zombie.Type = new Meekling(player.svPlayer);
+                }
+
+                player.svPlayer.preFrame = true;
+                if (node)
+                {
+                    player.svPlayer.SetNextWaypoint(node);
+                    player.svPlayer.onWaypoints = true;
+                }
+                else
+                {
+                    player.svPlayer.onWaypoints = false;
+                }
+
+                player.svPlayer.SvTrySetJob(JobIndex.Criminal, false, false);
+                player.svPlayer.player.Spawn(position, rotation, place.transform);
+                player.Stats.SetHealth(zombie.Type.Health, true);
+                List.Add(zombie);
+                player.svPlayer.svManager.StartCoroutine(ZombieLoop(player, zombie.Type));
+                player.svPlayer.svManager.StartCoroutine(Core.LookForPlayers(player.svPlayer));
+                return true;
             }
 
-            player.svPlayer.preFrame = true;
-            if (node)
-            {
-                player.svPlayer.SetNextWaypoint(node);
-                player.svPlayer.onWaypoints = true;
-            }
             else
             {
-                player.svPlayer.onWaypoints = false;
+                if (node.waypointType == WaypointType.Vehicle)
+                {
+                    if (Core.GenerateRandom(1, 100) < 5)
+                    {
+                        LootDrops.Initialize(player.shPlayer, 1);
+                    }
+                    mount.svEntity.Despawn();
+                }
+                else if (node.waypointType == WaypointType.Boat)
+                {
+                    if (Core.GenerateRandom(1, 100) < 5)
+                    {
+                        LootDrops.Initialize(player.shPlayer, 2);
+                    }
+                    mount.svEntity.Despawn();
+                }
+                else
+                {
+                    if (Core.GenerateRandom(1, 100) < 5)
+                    {
+                        LootDrops.Initialize(player.shPlayer, 3);
+                    }
+                    mount.svEntity.Despawn();
+                }
+                return true;
             }
-            player.svPlayer.SvTrySetJob(JobIndex.Criminal, false, false);
-            player.svPlayer.player.Spawn(position, rotation, place.transform);
-            player.Stats.SetHealth(zombie.Type.Health, true);
-            List.Add(zombie);
-            player.svPlayer.svManager.StartCoroutine(ZombieLoop(player, zombie.Type));
-            player.svPlayer.svManager.StartCoroutine(Core.LookForPlayers(player.svPlayer));
-            return true;
         }
 
         static IEnumerator ZombieLoop(Player player, ZombieType zombieType)

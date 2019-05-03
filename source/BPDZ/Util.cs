@@ -53,6 +53,8 @@ namespace BPDZ
 				File.Create("BPDayZ/DiscordLink.txt");
 				File.Create("BPDayZ/MuteList.txt");
                 File.Create("BPDayZ/SpyList.txt");
+                File.Create("BPDayZ/InfectedList.txt");
+                File.Create("BPDayZ/BleedingList.txt");
                 Log("Successfully created files");
 			}
 			Log("All resources exist and validated.");
@@ -66,6 +68,8 @@ namespace BPDZ
 			FileData.MutedPlayers = File.ReadAllLines(MuteFilePath).ToList();
             FileData.SpyPlayers = File.ReadAllLines(SpyListFile).ToList();
             FileData.DiscordLink = File.ReadAllText(DiscordPath);
+            FileData.BleedingPlayers = File.ReadAllLines(BleedingFile).ToList();
+            FileData.InfectedPlayers = File.ReadAllLines(InfectedPath).ToList();
         }
 
         /// <summary>
