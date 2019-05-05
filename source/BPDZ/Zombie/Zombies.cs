@@ -11,7 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Experimental.PlayerLoop;
+using static BPDZ.PlayerZ;
 
 namespace BPDZ
 {
@@ -61,7 +61,7 @@ namespace BPDZ
                 player.Stats.SetHealth(zombie.Type.Health, true);
                 List.Add(zombie);
                 player.svPlayer.svManager.StartCoroutine(ZombieLoop(player, zombie.Type));
-                player.svPlayer.svManager.StartCoroutine(Core.LookForPlayers(player.svPlayer));
+                player.svPlayer.svManager.StartCoroutine(LookForPlayers(player.svPlayer));
                 return true;
             }
 

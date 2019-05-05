@@ -22,6 +22,7 @@ using Newtonsoft.Json;
 using UniversalUnityHooks;
 using Logger = BP_API.Logger;
 using Object = UnityEngine.Object;
+using static BPDZ.PlayerZ;
 
 namespace BPDZ
 {
@@ -118,31 +119,13 @@ namespace BPDZ
                     return true;
                 }
             }
-            return false;
-        }
 
-        private static IEnumerator ContaminationLoop(Player player)
-        {
-            if (player.shPlayer.GetPosition().x < -999999 && !player.IsServerSide())
+            ShDoor door = player.player.manager.FindByID(doorID) as ShDoor;
+            if (door.IsOutside() && !door.svDoor.other.svDoor.InApartment() && !door.svDoor.InApartment())
             {
-                player.SendSuccessMessage("You have entered a Contaminated Area! You will take damage if you are not wearing a gas mask!");
-                while (player.shPlayer.GetPosition().x < -252 && !player.IsServerSide())
-                {
-                    yield return new WaitForSeconds(4f);
-                    if (player.shPlayer.GetWearable(WearableType.Head) != null)
-                    {
-                        if (player.shPlayer.GetWearable(WearableType.Head).index != -1627168389)
-                        {
-                            player.svPlayer.Damage(DamageIndex.Null, 5f, player.shPlayer, player.shPlayer.headCollider);
-                        }
-                    }
-                    else if (player.shPlayer.GetWearable(WearableType.Head) == null)
-                    {
-                        player.svPlayer.Damage(DamageIndex.Null, 5f, player.shPlayer, player.shPlayer.headCollider);
-                    }
-                }
-                player.SendSuccessMessage("You left the Contaminated Area");
+                door.SetRotation(player.player.GetRotation());
             }
+            return false;
         }
 
         private static bool OnPlayerVehicleEnter(Player player, ref int seat)
@@ -151,46 +134,9 @@ namespace BPDZ
             return false;
         }
 
-        private static IEnumerator CarLoop(Player player)
-        {
-            yield return new WaitForSeconds(1f);
-            while (player.shPlayer.curMount)
-            {
-                if (!player.Inventory.HasItem(1699387113))
-                {
-                    player.SendSuccessMessage("You ran out of fuel!");
-                }
-                yield return new WaitForSeconds(1);
-                player.Inventory.RemoveItem(1699387113, 1);
-            }
-        }
-
         static void OnStartServer(SvManager svMan)
         {
             svMan.startMoney = 0;
-        }
-
-        static public IEnumerator LookForPlayers(SvPlayer player)
-        {
-            while (!player.player.IsDead())
-            {
-                yield return new WaitForSeconds(5f);
-                foreach (Sector sector in player.localSectors)
-                {
-                    foreach (ShEntity shEntity in sector.centered)
-                    {
-                        if (!(shEntity == player.entity))
-                        {
-                            ShPlayer shPlayer = shEntity as ShPlayer;
-                            if (shPlayer && player.player.CanSeeEntity(shPlayer) && shPlayer.job.jobIndex != player.player.job.jobIndex)
-                            {
-                                player.targetEntity = shPlayer;
-                                player.SetState(10);
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         static bool OnPlayerCrime(Player player, ref byte crimeIndex, ref ShEntity victim)
@@ -225,6 +171,9 @@ namespace BPDZ
 
         static bool OnPlayerDamage(Player player, Player attacker, ref DamageIndex type, ref float amount, ref Collider collider)
         {
+            List<DamageIndex> BleedTypes = new List<DamageIndex>(){DamageIndex.Explosion, DamageIndex.Gun, DamageIndex.Melee};
+            if (GenerateRandom(1, 100) <= 2000 / (int)player.Stats.Health && BleedTypes.Contains(type) && attacker.shPlayer.curEquipable.index != -1477501700)
+                FileData.BleedingPlayers.Add(player.Username);
             if (attacker != null && type == DamageIndex.Melee)
             {
                 if (attacker.svPlayer.serverside)
@@ -234,8 +183,8 @@ namespace BPDZ
                         if (attacker.shPlayer.username == zombie.Player.player.username)
                         {
                             player.svPlayer.Damage(DamageIndex.Null, amount * zombie.Type.DamageMultiplier, player.shPlayer, collider);
-                            if(GenerateRandom(1, 100) <= 2000/(int)player.Stats.Health)
-                                FileData.InfectedPlayers.Add(player.Username);
+                            if (GenerateRandom(1, 100) <= 15)
+                            FileData.InfectedPlayers.Add(player.Username);
                             return true;
                         }
                     }
@@ -251,18 +200,6 @@ namespace BPDZ
             return false;
         }
 
-        static public IEnumerator PlayerBleed(Player player, float time)
-        {
-            player.shPlayer.StartEffect(EffectIndex.Intoxicated);
-            while (!player.shPlayer.IsDead() && time != 0)
-            {
-                yield return new WaitForSeconds(10f);
-                time = time - 10f;
-                player.svPlayer.Damage(DamageIndex.Null, GenerateRandomF(7, 13), player.shPlayer, player.shPlayer.headCollider);
-                player.SendSuccessMessage("You are bleeding. Consume medkits or get another player to heal you");
-            }
-        }
-
         static bool SvGlobalChatMessage(Player player, ref string message)
         {
             Manager.SvGlobalChatMessage(player, message);
@@ -274,7 +211,7 @@ namespace BPDZ
         {
             if (player.svPlayer.playerData.username != null)
             {
-                Loggers.Chat.Log($"[{player.ID}] {player.Username} Joined the server ({player.UserData.GetIpV4()})");
+                Loggers.Misc.Log($"[{player.ID}] {player.Username} Joined the server ({player.UserData.GetIpV4()})");
                 return;
             }
             Loggers.Misc.Log($"[{player.ID}] {player.Username} Registered ({player.UserData.GetIpV4()})");
@@ -324,7 +261,7 @@ namespace BPDZ
                 foreach (var player2 in player.svPlayer.svManager.players.Where(x => x.Value.job.jobIndex == player.Job.PlayerJob.jobIndex))
                     Players.GetPlayerFromInternalList(player2.Value).SendChatMessage(SvSendType.Self, $"<color=#{ColorUtility.ToHtmlStringRGB(player.Job.PlayerJob.info.jobColor)}>[{player.Job.PlayerJob.info.jobName.ToUpper()} CHAT] {player.Username}: {message}</color>");
             }
-            player.SendSuccessMessage("You are not in a gang");
+            player.SendSuccessMessage("You must be in a gang to execute this command");
         }
 
         [Command(nameof(SetJob), "Sets the job for specified player.", "Usage: /setjob [username] [jobindex]", new string[] { "setjob" }, true, true)]
